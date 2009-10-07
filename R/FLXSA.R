@@ -67,6 +67,7 @@ remove(validFLXSA.control)	# We do not need this function any more
 ## FLXSA ######################
 validFLXSA <- function(object){
 	# All FLQuant objects must have same dimensions
+	return(TRUE)
 	Dim <- dim(object@stock.n)
 	if (!all(dim(object@harvest) == Dim))
 		return("n and f arrays must have same dimensions")
@@ -110,12 +111,14 @@ remove(validFLXSA)	# We do not need this function any more
 ### Methods #############################################################
 FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE){
   
-  if (!is(diag.flag,"logical")) diag.flag=FALSE
+   if (!is(diag.flag,"logical")) diag.flag=FALSE
   Call <- match.call()
 	if (!inherits(stock, "FLStock"))
 		stop("stock must be an 'FLStock' object!")
+ print(0)
 	if (inherits(indices, "FLIndex"))
     indices<-FLIndices(indices)
+ print(0)
 	if (!inherits(indices, "FLIndices"))
   	stop("indices must be an 'FLIndices' object!")
   for (i in 1:length(indices))
@@ -123,9 +126,11 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
      if (is.na(indices[[i]]@range["startf"]) || is.na(indices[[i]]@range["endf"]))
   	     stop(paste("Must supply startf & endf for range in FLIndex",i))
 
-      if (!all(names(indices[[i]]@range) == c("min","max","plusgroup","minyear","maxyear","startf","endf")))
+      if (!all(c("min","max","plusgroup","minyear","maxyear","startf","endf") %in% names(indices[[i]]@range)))
          stop("Range must have names 'min','max','plusgroup','minyear','maxyear','startf','endf'")
 
+      indices[[i]]@range[c("min","max","plusgroup","minyear","maxyear","startf","endf")]==indices[[i]]@range[c("min","max","plusgroup","minyear","maxyear","startf","endf")]
+      
       indices[[i]]@range["min"]     <- max(indices[[i]]@range["min"], dims(indices[[i]])$min, stock@range["min"])
       indices[[i]]@range["max"]     <- min(indices[[i]]@range["max"], dims(indices[[i]])$max, stock@range["max"])
       indices[[i]]@range["minyear"] <- max(indices[[i]]@range["minyear"], dims(indices[[i]])$minyear, stock@range["minyear"])
@@ -136,7 +141,7 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
       
       indices[[i]]<-trim(indices[[i]],age=age,year=year)
       }
-
+ print(2)
   	if (!is(control, "FLXSA.control"))
   		stop("control must be an 'FLXSA.control' object!")
   	if (!validObject(stock))
@@ -512,6 +517,7 @@ setGeneric("diagnostics", function(object, ...){
 
 setMethod("diagnostics", signature(object="FLXSA"), function(object, ...){
 
+print(1)
     indices<-new("FLIndices")
     for (i in 1:length(object@index))
         {
