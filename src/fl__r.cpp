@@ -92,13 +92,13 @@ bool InputFLQuant(SEXP FLQuant, double ***pD, int MinAge, int MaxAge, int MinYea
          
          if (n >= 1 && INTEGER(dims)[0] >= 1) 
                {
-	            t = atoi(CHAR(VECTOR_ELT(VECTOR_ELT(dimnames, 0), 0))) - 1; 
+	            t = atoi(CHAR(STRING_ELT(VECTOR_ELT(dimnames, 0), 0))) - 1;
                _MinAge += t;
                _MaxAge += t;
   	            }
 		   if (n >= 2 && INTEGER(dims)[1] >= 1) 
                {
-	            t = atoi(CHAR(VECTOR_ELT(VECTOR_ELT(dimnames, 1), 0))) - 1; 
+	            t = atoi(CHAR(STRING_ELT(VECTOR_ELT(dimnames, 1), 0))) - 1;
                _MinYear += t;
                _MaxYear += t;
     	         }
@@ -156,13 +156,13 @@ bool InputFLQuant(SEXP FLQuant, double ***pD, short *pMin1, short *pMax1, short 
 
          if (n >= 1 && INTEGER(dims)[0] >= 1) 
                {
-	            t = atoi(CHAR(VECTOR_ELT(VECTOR_ELT(dimnames, 0), 0))) - 1; 
+	            t = atoi(CHAR(STRING_ELT(VECTOR_ELT(dimnames, 0), 0))) - 1;
                *pMin1 += t;
                *pMax1 += t;
   	            }
 		   if (n >= 2 && INTEGER(dims)[1] >= 1) 
                {
-	            t = atoi(CHAR(VECTOR_ELT(VECTOR_ELT(dimnames, 1), 0))) - 1; 
+	            t = atoi(CHAR(STRING_ELT(VECTOR_ELT(dimnames, 1), 0))) - 1;
                *pMin2 += t;
                *pMax2 += t;
     	         }

@@ -625,7 +625,6 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnControl(void)
    REAL(tspower)[0]         = Control.TSPower;
    INTEGER(TuningWindow)[0] = Control.TuningWindow;
    INTEGER(VPA)[0]          = Control.VPA;
-   
 
    SET_SLOT(xControl,install("tol"          ), MSStol);
    SET_SLOT(xControl,install("maxit"        ), MaxIters);   
