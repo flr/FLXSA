@@ -141,7 +141,7 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
       
       indices[[i]]<-trim(indices[[i]],age=age,year=year)
       }
- print(2)
+
   	if (!is(control, "FLXSA.control"))
   		stop("control must be an 'FLXSA.control' object!")
   	if (!validObject(stock))
@@ -412,8 +412,11 @@ if (length(nshk[,1])>0)
     res2@range   <- stock@range
     units(res2@harvest)<-"f"
 
+    res2@control@shk.n   <-as.logical(res2@control@shk.n)
+    res2@control@shk.f   <-as.logical(res2@control@shk.f)
+    res2@control@vpa     <-as.logical(res2@control@vpa)
+
 	  return(res2)
-#	  return(convert6d(res2))
     }
     
 FLXSA.control <- function(x=NULL, tol=10e-10, maxit=30, min.nse=0.3, fse=0.5, rage=0, qage=10, shk.n=TRUE,

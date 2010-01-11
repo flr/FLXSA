@@ -623,9 +623,8 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnControl(void)
    INTEGER(shkages)[0]      = Control.Shk2FAge;    
    REAL(tsrange)[0]         = Control.TSRange;     
    REAL(tspower)[0]         = Control.TSPower;
-   LOGICAL(plusgroup)[0]    = Control.PlusGroup;     
    INTEGER(TuningWindow)[0] = Control.TuningWindow;
-   LOGICAL(VPA)[0]          = (bool)(Control.VPA==1);
+   INTEGER(VPA)[0]          = Control.VPA;
    
 
    SET_SLOT(xControl,install("tol"          ), MSStol);
