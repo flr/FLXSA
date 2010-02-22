@@ -1,8 +1,8 @@
 Package: FLXSA
 Title: eXtended Survivor Analysis for FLR
 Author: Laurence Kell
-Version: 1.99-100
+Version: 2.0
 Description: Recreates stock numbers at age from commercial catch data
-Maintainer: Laurence Kell <laurence.kell@cefas.co.uk>
+Maintainer: Nobody <dev@null.org>
 License: GPL 2.0
-Depends: methods, FLCore(>= 1.99.100), FLAssess(>= 1.99.100)
+Depends: methods, FLCore(>= 2.2), FLAssess(>= 2.0)
