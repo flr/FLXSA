@@ -228,15 +228,15 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
 
        return(res)
        }
-       
+    
     res <-fqs(.Call("FLXSA", stock, indices, control, diag.flag))
-
     if (class(res) != "FLXSA") return(res)
 	     res@call <- as.character(Call)
 
 	  if (!missing(desc)) res@desc <- as.character(desc)
 
     ## put wts amd nhats into a data frame
+browser()
     df <- as.data.frame(res@wts)
     df1 <- (df[4])
     df1[df1 >= 1, 1] <- paste("index", df1[df1 >= 1, 1])
@@ -369,7 +369,6 @@ if (length(nshk[,1])>0)
        {
        res2@index.range[[i]]<-indices[[i]]@range
        res2@index.name[i]   <-indices[[i]]@name
-
        res2@index[[i]]      <-res@index[[i]]
        res2@index.hat[[i]]  <-FLQuant(res@index.hat[[i]], dimnames=dimnames(res@index.hat[[i]]))
        res2@index.res[[i]]  <-FLQuant(res@index.res[[i]], dimnames=dimnames(res@index.res[[i]]))
@@ -378,13 +377,12 @@ if (length(nshk[,1])>0)
        res2@q2.hat[[i]]     <-FLQuant(res@q2.hat[[i]],    dimnames=dimnames(res@q2.hat[[i]]))
 
        dmns<-dimnames(indices[[i]]@index)
-       na. <-is.na(indices[[i]]@index[dmns$age[ dmns$age  %in% dimnames(res2@index[[i]])$age],
-                                      dmns$year[dmns$year %in% dimnames(res2@index[[i]])$year]])
+       na. <-is.na(indices[[i]]@index[dmns$age[ dmns$age  %in% dimnames(res2@index[[i]])$age],dmns$year[dmns$year %in% dimnames(res2@index[[i]])$year]])
        
-       res2@index[[i]][    na.]<-NA
-       res2@index.hat[[i]][na.]<-NA
-       res2@index.res[[i]][na.]<-NA
-       res2@index.var[[i]][na.]<-NA
+       res2@index[[i]][na.] <- NA
+       res2@index.hat[[i]][na.]<- NA
+       res2@index.res[[i]][na.]<- NA
+       res2@index.var[[i]][na.]<- NA
 
        dimnames(res2@index[[i]]    )$unit   <-dimnames(indices[[i]]@index)$unit
        dimnames(res2@index.hat[[i]])$unit   <-dimnames(indices[[i]]@index)$unit
@@ -528,7 +526,7 @@ print(1)
 #        indices[[i]]@index <-object@index[[i]]
         indices[[i]] <- FLIndex(index=object@index[[i]])
         indices[[i]]@name  <-object@index.name[i]
-        indices[[i]]@range <-object@index.range[[i]]
+				#indices[[i]]@range <-object@index.range[[i]]
         }
     control <-object@control #<- eval(parse(text=xsa@call[4]))
 

@@ -1,7 +1,7 @@
 //
 // flxrsa.cpp
 //
-// Last Change: 10 Ago 2005 11:44
+// Last Change: 07 Apr 2010 16:52
 // $Id: flrxsa.cpp,v 1.11 2007/10/22 09:25:31 ltkell Exp $
 
 #include "flrxsa.hpp"
@@ -436,7 +436,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     int i, iAge;
     
     SEXP FLQuant, v, 
-         d1, d2, d3, d4, d5,  
+         d1, d2, d3, d4, d5, d6, 
          dim,   dimnames, names;    
 
     //Create new S4 object    
@@ -507,7 +507,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     int i, iAge;
     
     SEXP FLQuant, v, 
-         d1, d2, d3, d4, d5,  
+         d1, d2, d3, d4, d5, d6, 
          dim,   dimnames, names;    
 
     //Create new S4 object    
