@@ -236,7 +236,6 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
 	  if (!missing(desc)) res@desc <- as.character(desc)
 
     ## put wts amd nhats into a data frame
-browser()
     df <- as.data.frame(res@wts)
     df1 <- (df[4])
     df1[df1 >= 1, 1] <- paste("index", df1[df1 >= 1, 1])
