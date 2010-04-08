@@ -1,7 +1,7 @@
 //
 // flxrsa.cpp
 //
-// Last Change: 07 Apr 2010 16:52
+// Last Change: 07 Apr 2010 17:01
 // $Id: flrxsa.cpp,v 1.11 2007/10/22 09:25:31 ltkell Exp $
 
 #include "flrxsa.hpp"
@@ -511,7 +511,6 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
          dim,   dimnames, names;    
 
     //Create new S4 object    
-    //PROTECT(v = NEW_OBJECT(MAKE_CLASS("array")));
     PROTECT(FLQuant = NEW_OBJECT(MAKE_CLASS("FLQuant")));
 
     //Create array for slot    
