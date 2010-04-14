@@ -90,13 +90,16 @@ setClass("FLXSA",
 		diagnostics="data.frame",
 		control  ="FLXSA.control"),
 	prototype=prototype(
-		survivors=FLQuant(),
-		se.int   =FLQuant(),
-		se.ext   =FLQuant(),
-		n.fshk   =FLQuant(),
-		n.nshk   =FLQuant(),
-		var.fshk =FLQuant(),
-		var.nshk =FLQuant(),
+		survivors=FLQuant(quant='age'),
+		se.int   =FLQuant(quant='age'),
+		se.ext   =FLQuant(quant='age'),
+		n.fshk   =FLQuant(quant='age'),
+		n.nshk   =FLQuant(quant='age'),
+		var.fshk =FLQuant(quant='age'),
+		var.nshk =FLQuant(quant='age'),
+		catch.n =FLQuant(quant='age'),
+		stock.n =FLQuant(quant='age'),
+		harvest =FLQuant(quant='age'),
 		q.hat    =FLQuants(),
 		q2.hat   =FLQuants(),
 		diagnostics=new("data.frame"),
@@ -229,6 +232,8 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
        return(res)
        }
     
+    res <-.Call("FLXSA", stock, indices, control, diag.flag)
+
     res <-fqs(.Call("FLXSA", stock, indices, control, diag.flag))
     if (class(res) != "FLXSA") return(res)
 	     res@call <- as.character(Call)

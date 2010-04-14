@@ -64,13 +64,14 @@ bool InputFLQuant(SEXP FLQuant, double ***pD, int MinAge, int MaxAge, int MinYea
 
     double *Q     = NUMERIC_POINTER(Quant);
 
-  	 int dim[5], n = length(dims);
+  	 int dim[6], n = length(dims);
     
     dim[0] = INTEGER(dims)[0];
     dim[1] = INTEGER(dims)[1];
     dim[2] = INTEGER(dims)[2];
     dim[3] = INTEGER(dims)[3];
     dim[4] = INTEGER(dims)[4];
+    dim[5] = INTEGER(dims)[5];
 
     if (((int)dim[0]) <  1 || ((int)dim[1]) <  1 || 
         ((int)dim[2]) != 1 || ((int)dim[3]) != 1 || ((int)dim[4]) != 1)

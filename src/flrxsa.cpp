@@ -1,7 +1,7 @@
 //
 // flxrsa.cpp
 //
-// Last Change: 07 Apr 2010 17:01
+// Last Change: 09 Apr 2010 13:30
 // $Id: flrxsa.cpp,v 1.11 2007/10/22 09:25:31 ltkell Exp $
 
 #include "flrxsa.hpp"
@@ -445,18 +445,19 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 5));       
+    PROTECT(dim     = allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = 1;
     INTEGER(dim)[2] = 1;
     INTEGER(dim)[3] = 1;
     INTEGER(dim)[4] = 1;
+    INTEGER(dim)[5] = 1;
         
     //Allocate memory
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 5));
+    PROTECT(dimnames = allocVector(VECSXP, 6));
     
     PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
@@ -478,6 +479,10 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     PROTECT(d5 = allocVector(STRSXP, 1));
     SET_STRING_ELT(d5, 0, mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 4, d5);
+
+    PROTECT(d6 = allocVector(STRSXP, 1));
+    SET_STRING_ELT(d6, 0, mkChar("1"));
+    SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
     PROTECT(names = allocVector(STRSXP, 5));
@@ -486,6 +491,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     SET_STRING_ELT(names, 2, mkChar("unit"));
     SET_STRING_ELT(names, 3, mkChar("season"));
     SET_STRING_ELT(names, 4, mkChar("area"));
+    SET_STRING_ELT(names, 5, mkChar("iter"));
     setAttrib(dimnames, R_NamesSymbol, names);
     setAttrib(v, R_DimNamesSymbol, dimnames);
 
@@ -497,7 +503,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     //FLQuant = SET_SLOT(FLQuant, install("v"), v);
     FLQuant = R_do_slot_assign(FLQuant, install(".Data"), v);
 
-    UNPROTECT(10);
+    UNPROTECT(11);
     
     return FLQuant;
     }
@@ -515,18 +521,19 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 5));       
+    PROTECT(dim     = allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = 1;
     INTEGER(dim)[2] = 1;
     INTEGER(dim)[3] = 1;
     INTEGER(dim)[4] = 1;
+    INTEGER(dim)[5] = 1;
         
     //Allocate memory
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 5));
+    PROTECT(dimnames = allocVector(VECSXP, 6));
     
     PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
@@ -549,6 +556,10 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     SET_STRING_ELT(d5, 0, mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 4, d5);
     
+    PROTECT(d6 = allocVector(STRSXP, 1));
+    SET_STRING_ELT(d6, 0, mkChar("1"));
+    SET_VECTOR_ELT(dimnames, 5, d6);
+    
     //Create names for dimensions
     PROTECT(names = allocVector(STRSXP, 5));
     SET_STRING_ELT(names, 0, mkChar("age"));
@@ -556,6 +567,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     SET_STRING_ELT(names, 2, mkChar("unit"));
     SET_STRING_ELT(names, 3, mkChar("season"));
     SET_STRING_ELT(names, 4, mkChar("area"));
+    SET_STRING_ELT(names, 5, mkChar("iter"));
     setAttrib(dimnames, R_NamesSymbol, names);
     setAttrib(v, R_DimNamesSymbol, dimnames);
 
@@ -886,311 +898,3 @@ CatchDataR::CatchDataR(SEXP x)
    else
       Error = FiFiErrInput;
    }
-
-
-/*
-//VB Text code that outputs existing VPA Suite outputs
-
-void TextVB::OutputXSASurvivor(FLTypeXSAControl *pXSAControl, FLTypeXSASpecific *pXSASpecific)
-   {
-   ofstream outFile(File, ios::app);
-
-   //Survivors Summary
-   short  iAge,
-          MinAge,   MaxAge,
-          MinYear,  MaxYear,
-          DFTermN; 
-
-   double NHat,     FHat,     NWt,
-          VarRatio, ScaledWt;
-
-   long   iYrCls, iFleet,  iTune, lLb, lUb;
-          
-
-   LP2SHORT  DF;
-
-   LPDOUBLE  IntSE, ExtSE,
-             FShkN,
-             NShkN, NShkSE, NShkWt;
-
-   LP2DOUBLE Top,   Bottom, 
-             Catch, N, F, M, ECumZ;
-
-   // get the upper and lower bounds of the array
-   if (FAILED(SafeArrayGetLBound(pXSASpecific->NHat, 1, &lLb)) ||
-       FAILED(SafeArrayGetUBound(pXSASpecific->NHat, 1, &lUb)) ||
-       lLb != 1 || lUb < lLb                                     )
-      return;   
-
-   CheckIndices(&pStk->N, &MinAge, &MaxAge, &MinYear, &MaxYear);
-
-   short _MaxAge = min(MaxAge,pXSAControl->PlusGroup-1);
-
-   flallocArray(&DF,     1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   flallocArray(&Top,    1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   flallocArray(&Bottom, 1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   for (iYrCls = MaxYear-_MaxAge; iYrCls <= MaxYear-MinAge; iYrCls++)
-      for(iFleet = 1; iFleet <= NFleet; iFleet++)
-         {
-         DF[iFleet][iYrCls]     = 0;
-         Top[iFleet][iYrCls]    = 
-         Bottom[iFleet][iYrCls] = 0.0;
-         }
-   
-   flallocArray(&IntSE,  MaxYear-_MaxAge, MaxYear-MinAge);
-   flallocArray(&ExtSE,  MaxYear-_MaxAge, MaxYear-MinAge);
-   for (iYrCls = MaxYear-_MaxAge; iYrCls <= MaxYear-MinAge; iYrCls++)
-      IntSE[iYrCls] = ExtSE[iYrCls] = 0.0;
-   
-   GetDataAlreadyAlloc(&pXSASpecific->InternalSE, &IntSE,  (short)(MaxYear-_MaxAge), (short)(MaxYear-MinAge)); 
-   GetDataAlreadyAlloc(&pXSASpecific->ExternalSE, &ExtSE,  (short)(MaxYear-_MaxAge), (short)(MaxYear-MinAge)); 
-   
-   if (pXSAControl->Shk2F)
-      {
-      flallocArray(&FShkN,  MaxYear-_MaxAge, MaxYear-MinAge);
-      
-      GetDataAlreadyAlloc(&pXSASpecific->FShkN,  &FShkN,  (short)(MaxYear-_MaxAge), (short)(MaxYear-MinAge));
-      }
-
-   if (pXSAControl->Shk2N && pXSAControl->LRcrtAge >= MinAge)
-      {
-      flallocArray(&NShkN,  MinAge, pXSAControl->LRcrtAge);
-      flallocArray(&NShkSE, MinAge, pXSAControl->LRcrtAge);
-      flallocArray(&NShkWt, MinAge, pXSAControl->LRcrtAge);
-
-      GetDataAlreadyAlloc(&pXSASpecific->NShkN,  &NShkN,  MinAge, pXSAControl->LRcrtAge);
-      GetDataAlreadyAlloc(&pXSASpecific->NShkSE, &NShkSE, MinAge, pXSAControl->LRcrtAge);
-      GetDataAlreadyAlloc(&pXSASpecific->NShkWt, &NShkWt, MinAge, pXSAControl->LRcrtAge);
-      }
-
-   //Stock Stuff
-   if (!GetDataNotAlreadyAlloc(&pStk->F, &F, &MinAge, &MaxAge, &MinYear, &MaxYear))
-      return;
-
-   flallocArray(&Catch, MinAge, MaxAge, MinYear, MaxYear);
-   flallocArray(&N,     MinAge, MaxAge, MinYear, MaxYear);
-   flallocArray(&M,     MinAge, MaxAge, MinYear, MaxYear);
-   flallocArray(&ECumZ, MinAge, MaxAge, MinYear, MaxYear);
-   //flallocArray(&Tau,                   MinYear, MaxYear);
-              
-   if (!GetDataAlreadyAlloc(&pStk->Catch,            &Catch, MinAge, MaxAge, MinYear, MaxYear) ||
-       !GetDataAlreadyAlloc(&pStk->N,                &N,     MinAge, MaxAge, MinYear, MaxYear) || 
-       !GetDataAlreadyAlloc(&pStk->M,                &M,     MinAge, MaxAge, MinYear, MaxYear)    )
-       //!GetDataAlreadyAlloc(&pXSASpecific->TSWeight, &Tau,                         MinYear, MaxYear)   )
-      {
-      free_flallocArray(F,     MinAge, MaxAge, MinYear, MaxYear);
-      free_flallocArray(Catch, MinAge, MaxAge, MinYear, MaxYear);
-      free_flallocArray(N,     MinAge, MaxAge, MinYear, MaxYear);
-      free_flallocArray(M,     MinAge, MaxAge, MinYear, MaxYear);
-      free_flallocArray(ECumZ, MinAge, MaxAge, MinYear, MaxYear);
-      //free_flallocArray(Tau,                   MinYear[1], MaxYear[1]);
-         
-      return;
-      }     
-
-   for (iYrCls=MaxYear-_MaxAge; iYrCls <= MaxYear-MinAge; iYrCls++)
-      {
-      int iYear = min(MaxYear, iYrCls+MaxAge);
-      int iAge  = min(MaxAge,  MaxYear-iYrCls);
-
-      for (iAge  = min(_MaxAge, MaxYear - iYrCls); iAge >= max(MinAge, MinYear - iYrCls); iAge--)
-         {
-         iYear = iYrCls + iAge;
-         ECumZ[iAge][iYear] = exp(-F[iAge][iYear]-M[iAge][iYear]) * (iAge == MaxAge || iYear == MaxYear ? 1.0 : ECumZ[iAge+1][iYear+1]);
-         }               
-      }
-
-
-   //Fleet survivor estimates
-   outFile << "Fleet disaggregated estimates of survivors :\n\n\n";
-   for (iAge = MinAge; iAge <= _MaxAge; iAge++)
-      {
-      DFTermN  = 0;
-      ScaledWt = 0.0;
-
-      iYrCls = MaxYear - iAge;      
-
-      outFile << "Age " << iAge;
-      if (iAge <= pXSAControl->LRcrtAge)
-         outFile << "  Catchability dependent on age and year class strength\n\n";
-      else if (iAge <= pXSAControl->ConQAge)
-         outFile << "  Catchability constant w.r.t. time\n\n";
-      else 
-         outFile << "  Catchability constant w.r.t. time and age (fixed at the value for age) " << pXSAControl->ConQAge-1 << "\n\n";
-   
-      outFile << "Year class = " << MaxYear - iAge << "\n\n";
-
-      FLTypeAssessFleet *pFlt_ = pFlt;
-      for (iFleet = max(1, lLb), iTune = 1; iFleet <= min(NFleet, lUb); iFleet++)
-         {
-         FLTypeDArray  NHatDAElem, NWtDAElem;
-   
-         if (pFlt_->Tuning == VBTRUE)
-            if (!FAILED(SafeArrayGetElement(pXSASpecific->NHat,  &iFleet, &NHatDAElem)) &&
-                !FAILED(SafeArrayGetElement(pXSASpecific->NWt,   &iFleet, &NWtDAElem)))
-               {             
-               long l[2];
-
-               outFile << "Fleet"  << iTune++         << "\n";
-            
-               outFile << "Age,          ";
-               for (l[0] = MinAge; l[0] <= MinAge - 1 + iAge; l[0]++)
-                  {
-                  sprintf(FormattedText, "%6d,", l[0]);
-                  outFile << FormattedText;
-                  }
-
-               outFile << "\nSurvivors,    ";
-               for (l[0] = MinAge - 1 + iAge; l[0] >= MinAge; l[0]--)
-                  {
-                  l[1] = MaxYear - iAge + l[0];
-                  NHat = NWt = 0.0;
-                  SafeArrayGetElement(NHatDAElem.D, l, &NHat);
-                  SafeArrayGetElement(NWtDAElem.D,  l, &NWt);
-                  NHat *= ECumZ[l[0]][l[1]];
-
-                  if (NWt > 0.0)
-                     {
-                     DF[ iFleet][MaxYear-iAge]++;  
-                     Top[iFleet][MaxYear-iAge] += NHat*NWt;
-                     }
-
-                  sprintf(FormattedText, "%6.0f,", NHat);
-                   
-                  outFile << FormattedText;
-                  }
-               outFile << "\n";
-
-               DFTermN += DF[ iFleet][MaxYear-iAge];  
-               
-               outFile << "Raw weights,  ";
-                              
-               for (l[0] = MinAge - 1 + iAge; l[0] >= MinAge; l[0]--)
-                  {
-                  l[1] = MaxYear - iAge + l[0];
-                  NWt = 0.0;
-                  SafeArrayGetElement(NWtDAElem.D, l, &NWt);
-                   
-                  Bottom[iFleet][MaxYear-iAge] += NWt; 
-                
-                  sprintf(FormattedText, "%6.2f,", NWt);
-                   
-                  outFile << FormattedText;
-                  }
-               outFile << "\n";
-               }
-         outFile << "\n\n";
-         ScaledWt += Bottom[iFleet][MaxYear-iAge];
-      pFlt_++; 
-      }
-
-   if (pXSAControl->Shk2F)
-   ScaledWt  += SQR(1.0/pXSAControl->FShkSE);
-   if (pXSAControl->Shk2N && iAge <= pXSAControl->LRcrtAge)
-   ScaledWt += NShkWt[iAge];
-
-
-      outFile << "\n\n\n"
-              << "Fleet,                        ,Int,      Ext,     Var,     N,   Scaled,   Estimated\n"
-              << ",                             ,s.e.,     s.e,     Ratio,    ,   Weights,          F\n"; 
-
-      pFlt_ = pFlt;
-      for (iFleet = max(1, lLb), iTune = 1; iFleet <= min(NFleet, lUb); iFleet++)
-         {
-         double        IntFltSE,    ExtFltSE;
-			FLTypeDArray  IntSEDAElem, ExtSEDAElem;
-      
-			IntFltSE = ExtFltSE = 0.0;
-
-         if (!FAILED(SafeArrayGetElement(pXSASpecific->InternalFleetSE,  &iFleet, &IntSEDAElem)))
-            SafeArrayGetElement(IntSEDAElem.D, &iYrCls, &IntFltSE);
-
-         if (!FAILED(SafeArrayGetElement(pXSASpecific->ExternalFleetSE,  &iFleet, &ExtSEDAElem)))
-            SafeArrayGetElement(ExtSEDAElem.D, &iYrCls, &ExtFltSE);
-             
-			double NHatMinus1 ;
-
-			NHat       = max(0.0,Top[iFleet][iYrCls]/Bottom[iFleet][iYrCls]);
-			NHatMinus1 = NHat*exp(M[iAge][MaxYear]) + Catch[iAge][MaxYear]*exp(M[iAge][MaxYear]/2.0);
-			
-			FHat = 0.0;
-			if  (NHatMinus1 > 0.0  && NHat > 0.0)
-				{
-				FHat = NHatMinus1/NHat - M[iAge][MaxYear];
-				if (FHat > 0.0)
-					FHat = log(FHat);
-				}
-			
-         VarRatio   = IntFltSE > 0 ? ExtFltSE/IntFltSE : 0.0;
-         
-			outFile << "Fleet "          << iTune-1 << ",           ";
-         sprintf(FormattedText, "%6.0f,   %6.4f,  %6.4f,    %6.4f,%4d,    %6.4f,     %6.4f", NHat, IntFltSE, ExtFltSE, VarRatio, DF[iFleet][iYrCls], Bottom[iFleet][MaxYear-iAge]/ScaledWt, FHat);
-         outFile << FormattedText << "\n";
-         }        
-
-      if (pXSAControl->Shk2F)
-         {
-         DFTermN++;
-
-         outFile << "\n\nF shrinkage mean,  ";
-         
-			NHat = FShkN[MaxYear-iAge];
-         FHat = max(0.0, log(NHat*exp(M[iAge][MaxYear])/(NHat - Catch[iAge][MaxYear]*exp(M[iAge][MaxYear]/2.0)) - M[iAge][MaxYear]/2.0));
-         
-			sprintf(FormattedText, "%6.0f,  %6.4f,         ,          ,    ,    %6.4f,     %6.4f", FShkN[iYrCls],pXSAControl->FShkSE,SQR(1.0/pXSAControl->FShkSE)/ScaledWt,FHat);
-         outFile << FormattedText;
-         }
-
-      if (pXSAControl->Shk2N && iAge <= pXSAControl->LRcrtAge)
-         {
-         DFTermN++;
-
-			outFile << "\nP shrinkage mean, ";
-         
-			NHat = NShkN[MaxYear-iYrCls];
-         FHat = max(0.0, log(NHat*exp(M[iAge][MaxYear])/(NHat - Catch[iAge][MaxYear]*exp(M[iAge][MaxYear]/2.0)) - M[iAge][MaxYear]/2.0));
-
-			sprintf(FormattedText, "%6.0f,  %6.4f,         ,          ,    ,    %6.4f,     %6.4f", NHat,NShkSE[iAge],NShkWt[iAge]/ScaledWt,FHat);
-         outFile << FormattedText;
-         }
-      
-      outFile << "\n\nWeighted prediction :\n\n";
-      outFile << ",Survivors                     ,Int,     Ext,     Var,     N,,                     F\n";
-      outFile << ",at end of year,                s.e.,    s.e.,    Ratio\n";      
-      VarRatio = IntSE[iYrCls] > 0 ? ExtSE[iYrCls]/IntSE[iYrCls] : 0.0;
-      NHat = N[iAge][MaxYear]*exp(-F[iAge][MaxYear]-M[iAge][MaxYear]);
-      sprintf(FormattedText, "                  ,%6.0f,    %6.4f,  %6.4f,   %6.4f,%4d,                 %6.4f", NHat,IntSE[iYrCls],ExtSE[iYrCls],VarRatio,DFTermN,F[iAge][MaxYear]);
-      //sprintf(FormattedText, ",%6.0f,%6.4f,%6.0f,%4d,,%6.4f", TermN[iAge+1],IntSE[iYrCls],ExtSE[iYrCls],VarRatio,DFTermN,F[iAge][MaxYear]);
-      outFile << FormattedText;
-      outFile << "\n\n\n\n";
-      }
-    outFile << "\n";
-
-
-   if (pXSAControl->Shk2F)
-      free_flallocArray(FShkN,  MaxYear-_MaxAge, MaxYear-MinAge);
-      
-   if (pXSAControl->Shk2N && pXSAControl->LRcrtAge >= MinAge)
-      {
-      free_flallocArray(NShkN,  MinAge, pXSAControl->LRcrtAge);
-      free_flallocArray(NShkSE, MinAge, pXSAControl->LRcrtAge);
-      free_flallocArray(NShkWt, MinAge, pXSAControl->LRcrtAge);
-      }
-
-   free_flallocArray(DF,     1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   free_flallocArray(Top,    1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   free_flallocArray(Bottom, 1, NFleet, MaxYear-_MaxAge, MaxYear-MinAge);
-   
-   free_flallocArray(IntSE,             MaxYear-_MaxAge, MaxYear-MinAge);
-   free_flallocArray(ExtSE,             MaxYear-_MaxAge, MaxYear-MinAge);
-   
-   free_flallocArray(Catch, MinAge, MaxAge, MinYear, MaxYear);
-   free_flallocArray(N,     MinAge, MaxAge, MinYear, MaxYear);
-   free_flallocArray(F,     MinAge, MaxAge, MinYear, MaxYear);
-   free_flallocArray(M,     MinAge, MaxAge, MinYear, MaxYear);
-   free_flallocArray(ECumZ, MinAge, MaxAge, MinYear, MaxYear);
-   //free_flallocArray(Tau,                         MinYear, MaxYear);
-
-   outFile.close();
-   }
-*/
