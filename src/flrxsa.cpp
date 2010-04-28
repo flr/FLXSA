@@ -1,7 +1,7 @@
 //
 // flxrsa.cpp
 //
-// Last Change: 09 Apr 2010 13:30
+// Last Change: 28 Apr 2010 15:01
 // $Id: flrxsa.cpp,v 1.11 2007/10/22 09:25:31 ltkell Exp $
 
 #include "flrxsa.hpp"
@@ -485,7 +485,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 5));
+    PROTECT(names = allocVector(STRSXP, 6));
     SET_STRING_ELT(names, 0, mkChar("age"));
     SET_STRING_ELT(names, 1, mkChar("year"));
     SET_STRING_ELT(names, 2, mkChar("unit"));
@@ -561,7 +561,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 5));
+    PROTECT(names = allocVector(STRSXP, 6));
     SET_STRING_ELT(names, 0, mkChar("age"));
     SET_STRING_ELT(names, 1, mkChar("year"));
     SET_STRING_ELT(names, 2, mkChar("unit"));
@@ -579,7 +579,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     //FLQuant = SET_SLOT(FLQuant, install("v"), v);
     FLQuant = R_do_slot_assign(FLQuant, install(".Data"), v);
 
-    UNPROTECT(10);
+    UNPROTECT(11);
     
     return FLQuant;
     }
