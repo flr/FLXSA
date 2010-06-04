@@ -570,7 +570,7 @@ print(1)
 
     cat("Regression weights\n")
     ### Calculation of time series weighting
-    yr.range <- (dims(object@harvest)$maxyear-9):dims(object@harvest)$maxyear
+    yr.range <- max(dims(object@harvest)$minyear,(dims(object@harvest)$maxyear-9)):dims(object@harvest)$maxyear
     regWt <- FLQuant(dimnames=list(age = 'all', year = yr.range))
     for(y in yr.range) regWt[,as.character(y)] <- (1-((max(yr.range)-y)/control@tsrange)^control@tspower)^control@tspower
     print(matrix(round(regWt,3),dims(regWt)$age,dimnames=list(age="all",year=yr.range)))
