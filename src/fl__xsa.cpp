@@ -2227,8 +2227,8 @@ void ExtendedSurvivorsAnalysis::Project(double FMult, double TransitionRate, boo
       _N[_MaxAge][2] += _N[_MaxAge][1]*exp(-Sel[_MaxAge]*(*pFBar)-M[_MaxAge][MaxYear]);
    
 
-double t;
-t = max(t,0.0);
+//double t;
+//t = max(t,0.0);
 
    //ABC
    if (TransitionRate > 0.0)
