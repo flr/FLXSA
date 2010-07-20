@@ -20,7 +20,7 @@ FLXSA.control(x = NULL, tol = 1e-09, maxit = 30, min.nse = 0.3, fse = 0.5,
   \item{maxit}{ The maximum number of iterations allowed }
   \item{min.nse}{ The minimum value of SE permitted in estimate of N hat }
   \item{fse}{ User set SE of F when shrinking to mean F }
-  \item{rage}{ The oldest age for which the two parameter model is used for catchability at age }
+  \item{rage}{ The oldest age for which the two parameter model is used for catchability at age. Note that this value should be one less than the value used in the executable version of XSA }
   \item{qage}{ The age after which catchability is no longer estimated. q at older ages set
     to the value at this age }
   \item{shk.n}{ If \code{TRUE}, shrinkage to mean N }
