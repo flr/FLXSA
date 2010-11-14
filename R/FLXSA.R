@@ -511,93 +511,113 @@ setMethod("show", signature(object="FLXSA.control"),
 # DiagsXSA::FLXSA
 # Author     : MP, KH & JJP, EJ
 # Modified to become summary fof FLXSA
+# Updated    : RDS   11/11/10 
 # ---------------------------------------------------------------------------------
+
+
 
 setGeneric("diagnostics", function(object, ...){
 	standardGeneric("diagnostics")
 	}
 )
 
-setMethod("diagnostics", signature(object="FLXSA"), function(object, ...){
+setMethod("diagnostics", signature(object="FLXSA"), 
+  tempfun <- function(object, sections=rep(T, 8), ...){
 
-print(1)
+#print(1)
     indices<-new("FLIndices")
     for (i in 1:length(object@index))
         {
-#        indices[[i]]       <-new("FLIndex")
-#        indices[[i]]@index <-object@index[[i]]
-        indices[[i]] <- FLIndex(index=object@index[[i]])
-        indices[[i]]@name  <-object@index.name[i]
-				#indices[[i]]@range <-object@index.range[[i]]
+        indices[[i]]       <- FLIndex(index=object@index[[i]])
+        indices[[i]]@name  <- object@index.name[i]
         }
-    control <-object@control #<- eval(parse(text=xsa@call[4]))
+    control <-object@control 
 
-    cat("FLR XSA Diagnostics ",  as.character(Sys.time()),"\n\nCPUE data from ", object@call[3], "\n\n",
-        "Catch data for ", dims(object@stock.n)$year," years. ", dims(object@stock.n)$minyear," to ",
-        dims(object@stock.n)$maxyear, ". Ages ",dims(object@stock.n)$min," to ",dims(object@stock.n)$max,".\n\n", sep="")
+    titledat <- paste("FLR XSA Diagnostics ",  as.character(Sys.time()),
+                    "\n\nCPUE data from ", object@call[3], "\n\n",
+                    "Catch data for ", dims(object@stock.n)$year," years ", 
+                     dims(object@stock.n)$minyear," to ",dims(object@stock.n)$maxyear, 
+                    ". Ages ",dims(object@stock.n)$min," to ",dims(object@stock.n)$max,".\n\n", sep="")
+#   print(titledat)
 
-    # print general tuning series information
+    # general tuning series information
     idx.info  <- NULL
     for (i in 1:length(object@index)) {
        idx.info  <-  rbind(idx.info,c(indices[[i]]@name, (dims(object@index[[i]]))$min,
           (dims(object@index[[i]]))$max,(dims(object@index[[i]]))$minyear,(dims(object@index[[i]]))$maxyear,
           indices[[i]]@range["startf"], indices[[i]]@range["endf"]))
     }
-
     dimnames(idx.info) <- list(NULL,c("fleet","first age","last age","first year","last year","alpha","beta"))
-    print(as.data.frame(idx.info))
-    cat("\n\n","Time series weights :\n\n")
-    cat(ifelse(control@tsrange==0|control@tspower==0, "   Tapered time weighting not applied\n\n",
+#    print(as.data.frame(idx.info))
+
+    set1 <- paste("\n\n","Time series weights :\n\n")
+    set2 <- paste(ifelse(control@tsrange==0|control@tspower==0, "   Tapered time weighting not applied\n\n",
         paste("   Tapered time weighting applied\n", "  Power =  ",control@tspower,"over ",control@tsrange,
         "years\n\n", sep=" ")))
 
-    cat("Catchability analysis :\n\n")
-    cat(ifelse(as.numeric(control@rage) < dims(object@stock.n)$min, "    Catchability independent of size for all ages\n\n",
+    set3 <- "Catchability analysis :\n\n"
+    set4 <- paste(ifelse(as.numeric(control@rage) < dims(object@stock.n)$min, "    Catchability independent of size for all ages\n\n",
         paste("    Catchability independent of size for ages >  ",control@rage,"\n\n",sep=" ")))
-    cat(ifelse(as.numeric(control@qage) < dims(object@stock.n)$min, "    Catchability independent of age for all ages\n\n",
+
+    set5 <- paste(ifelse(as.numeric(control@qage) < dims(object@stock.n)$min, "    Catchability independent of age for all ages\n\n",
         paste("    Catchability independent of age for ages >  ",control@qage,"\n\n",sep=" ")))
 
-    cat("Terminal population estimation :\n\n")
-    cat(ifelse(control@shk.f, paste("    Survivor estimates shrunk towards the mean F\n",
+    set6 <- "Terminal population estimation :\n\n"
+    set7 <- paste(ifelse(control@shk.f, paste("    Survivor estimates shrunk towards the mean F\n",
         "   of the final  ",control@shk.yrs,"years or the ",control@shk.ages,"oldest ages.\n\n",
         "   S.E. of the mean to which the estimates are shrunk =  ", control@fse,"\n",sep=" "),
         "    Final estimates not shrunk towards mean F\n"))
-    cat(ifelse(as.numeric(control@min.nse)==0, "\n", paste("\n", "   Minimum standard error for population\n",
-        "   estimates derived from each fleet = ",control@min.nse,"\n\n", sep=" ")))
-    cat("   prior weighting not applied\n\n")
+    set8 <- ifelse(as.numeric(control@min.nse)==0, "\n", paste("\n", "   Minimum standard error for population\n",
+        "   estimates derived from each fleet = ",control@min.nse,"\n\n", sep=" "))
+    set9 <- "   prior weighting not applied\n\n"
 
-    cat("Regression weights\n")
+# cat(set1, set2, set3, set4, set5, set6, set7, set8, set9)
+
+    regwtstitle <- "Regression weights\n"
     ### Calculation of time series weighting
-    mxy <- dims(object@harvest)$maxyear
-    mny <- dims(object@harvest)$minyear
-    if(mxy-mny>9) columns <- 9 else columns <- mxy-mny
-    yr.range <- (mxy - columns):mxy
+    yr.range <- max(dims(object@harvest)$minyear,(dims(object@harvest)$maxyear-9)):dims(object@harvest)$maxyear
     regWt <- FLQuant(dimnames=list(age = 'all', year = yr.range))
-    for(y in yr.range) regWt[,as.character(y)] <- (1-((max(yr.range)-y)/control@tsrange)^control@tspower)^control@tspower
-    print(matrix(round(regWt,3),dims(regWt)$age,dimnames=list(age="all",year=yr.range)))
+    for(y in yr.range) 
+      regWt[,as.character(y)] <- (1-((max(yr.range)-y)/control@tsrange)^control@tspower)^control@tspower
+    regwts <- matrix(round(regWt,3),dims(regWt)$age,dimnames=list(age="all",year=yr.range))
+# cat(regwtstitle)
+# print(regwts)
 
-    cat("\n\n Fishing mortalities\n")
-    print(matrix(round(trim(object@harvest,year=yr.range),3), dims(object@harvest)$age,
-        dimnames=list(age=dims(object@harvest)$min:dims(object@harvest)$max, year=yr.range)))
+    FMtitle <- "\n\n Fishing mortalities\n"
+    FM      <- matrix(round(trim(object@harvest,year=yr.range),3), dims(object@harvest)$age,
+        dimnames=list(age=dims(object@harvest)$min:dims(object@harvest)$max, year=yr.range))
+# cat(FMtitle)
+# print(FM)
 
-    cat("\n\n XSA population number (Thousand)\n")
-    print(t(matrix(round(trim(object@stock.n,year=yr.range),0), dims(object@stock.n)$age,
+    PNtitle <- "\n\n XSA population number (Thousand)\n"
+    PN <- (t(matrix(round(trim(object@stock.n,year=yr.range),0), dims(object@stock.n)$age,
         dimnames=list(age=dims(object@stock.n)$min:dims(object@stock.n)$max, year=yr.range))))
+# cat(PNtitle)
+# print(PN)
 
     nextyear  <- dims(object@survivors)$maxyear
-    cat("\n\n Estimated population abundance at 1st Jan ",nextyear,"\n")
-    print(t(matrix(round(object@survivors[,as.character(nextyear)]),
-        dimnames=list(age=dims(object@survivors)$min:dims(object@survivors)$max, year=nextyear))))
+    survtitle <- paste("\n\n Estimated population abundance at 1st Jan ",nextyear,"\n")
+    survivors <- t(matrix(round(object@survivors[,as.character(nextyear)]),
+        dimnames=list(age=dims(object@survivors)$min:dims(object@survivors)$max, year=nextyear)))
+# cat(survtitle)
+# print(survivors)
 
     ## tuning info
-    for (f in 1:length(object@index)) {
-        cat("\n\n Fleet: ",indices[[f]]@name,"\n\n","Log catchability residuals.\n\n")
+    fleetname <- list()
+    logQs     <- list()
+    mlqbtitle <- list()
+    mlqb      <- list()
 
-        print(matrix(round(object@index.res[[f]],3), nrow=dims(object@index.res[[f]])$age,
-            dimnames=list(age=dimnames(object@index.res[[f]])$age, year=dimnames(object@index.res[[f]])$year)))
+    for (f in 1:length(object@index)) {
+        fleetname[[f]] <- paste("\n\n Fleet: ",indices[[f]]@name,"\n\n","Log catchability residuals.\n\n")
+        logQs[[f]] <- matrix(round(object@index.res[[f]],3), nrow=dims(object@index.res[[f]])$age,
+            dimnames=list(age=dimnames(object@index.res[[f]])$age, year=dimnames(object@index.res[[f]])$year))
+
+#       print(fleetname[[f]])
+#       print(logQs[[f]])
 
         if (control@rage < dims(object@index[[f]])$max){
-          cat("\n\n Mean log catchability and standard error of ages with catchability \n",
+          mlqbtitle[[f]] <- paste("\n\n Mean log catchability and standard error of ages with catchability \n",
               "independent of year class strength and constant w.r.t. time \n\n")
 
           q.tab <- rbind(Mean_Logq=round(log(object@q.hat[[f]]),4), S.E_Logq=round(sd(matrix(object@index.res[[f]],
@@ -605,26 +625,77 @@ print(1)
           colnames(q.tab) <- dimnames(object@q.hat[[f]])$age
 
           if (dims(object@index[[f]])$min <= control@rage ) {
-              print(q.tab[,as.character((control@rage+1):max(as.numeric(dimnames(object@index[[f]])$age)))])
-          } else {print(q.tab)}
+              mlqb[[f]] <- q.tab[,as.character((control@rage+1):max(as.numeric(dimnames(object@index[[f]])$age)))]
+          } else {mlqb[[f]] <- q.tab}
         }
         # print reg stats powermodel, note that maximum printed age is min(rage, max(age in tun series))
         if (dims(object@index[[f]])$min <= control@rage ) {
-            cat("\n Regression statistics \n", "Ages with q dependent on year class strength \n")
-            print(cbind((matrix(object@q2.hat[[f]][as.character(dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)))],dimnames=list(age=paste("Age ",dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)),sep=""),"slope"))),
+            mlqbtitle[[f]] <- paste("\n Regression statistics \n", "Ages with q dependent on year class strength \n")
+            mlqb[[f]] <- paste(cbind((matrix(object@q2.hat[[f]][as.character(dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)))],dimnames=list(age=paste("Age ",dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)),sep=""),"slope"))),
             (matrix(object@q.hat[[f]][as.character(dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)))],dimnames=list(age=dims(object@index[[f]])$min:(min(control@rage,dims(object@index[[f]])$max)),"intercept")))))
         }
+#        cat(mlqbtitle[[f]])
+#        print(mlqb[[f]])
     }
 
-    cat("\n\n Terminal year survivor and F summaries: \n ")
+    tysurvtitle <- "\n\n Terminal year survivor and F summaries: \n "
+    header      <- list()
+    tysurvtext  <- list()
+# cat(tysurvtitle)
     for ( age in sort(unique(object@diagnostics$age))){
-        cat("\n Age ",age, " Year class =",  max(object@diagnostics$year) - age ," \n\n","source \n", sep="")
+        header[[age]] <- paste("\n Age ",age, " Year class =",  max(object@diagnostics$year) - age ," \n\n","source \n", sep="")
         weights <- object@diagnostics[(object@diagnostics$age==age) & (object@diagnostics$year== max(object@diagnostics$year)),]
         # calc surivors and scaled wts
         weights$survivors <- round(exp(weights$nhat))
         weights$scaledWts <- round(weights$w / sum(weights$w) ,3)
         row.names(weights) <- weights$source
-        print(weights[ ,c("scaledWts","survivors","yrcls") ])
+        tysurvtext[[age]] <- weights[ ,c("scaledWts","survivors","yrcls") ]
+
+# cat(header[[age]])
+# print(tysurvtext[[age]])
     }
+
+## send the text to the screen
+
+if(sections[1]){
+  cat(titledat)
+  print(as.data.frame(idx.info))
+}
+if(sections[2]){
+  cat(set1, set2, set3, set4, set5, set6, set7, set8, set9)
+}
+if(sections[3]){
+  cat(regwtstitle)
+  print(regwts)
+}
+if(sections[4]){
+  cat(FMtitle)
+  print(FM)
+}
+if(sections[5]){
+  cat(PNtitle)
+  print(PN)
+}
+if(sections[6]){
+  cat(survtitle)
+  print(survivors)
+}
+if(sections[7]){
+  for(f in 1:length(object@index)) {
+    cat(fleetname[[f]])
+    print(logQs[[f]])
+    cat(mlqbtitle[[f]])
+    print(mlqb[[f]])
+  }
+}
+if(sections[8]){
+  cat(tysurvtitle)
+  for ( age in sort(unique(object@diagnostics$age))){
+    cat(header[[age]])
+    print(tysurvtext[[age]])
+  }
+}
     invisible()
-})
+}
+)
+
