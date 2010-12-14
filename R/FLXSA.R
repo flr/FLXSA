@@ -523,7 +523,7 @@ setGeneric("diagnostics", function(object, ...){
 
 setMethod("diagnostics", signature(object="FLXSA"), 
   tempfun <- function(object, sections=rep(T, 8), ...){
-
+#browser()
 #print(1)
     indices<-new("FLIndices")
     for (i in 1:length(object@index))
@@ -641,10 +641,13 @@ setMethod("diagnostics", signature(object="FLXSA"),
     tysurvtitle <- "\n\n Terminal year survivor and F summaries: \n "
     header      <- list()
     tysurvtext  <- list()
+#browser()
 # cat(tysurvtitle)
-    for ( age in sort(unique(object@diagnostics$age))){
-        header[[age]] <- paste("\n Age ",age, " Year class =",  max(object@diagnostics$year) - age ," \n\n","source \n", sep="")
-        weights <- object@diagnostics[(object@diagnostics$age==age) & (object@diagnostics$year== max(object@diagnostics$year)),]
+    agevec <- sort(unique(object@diagnostics$age))
+    for ( age in 1:length(agevec)){
+#    cat("age: ", age, "\n")
+        header[[age]] <- paste("\n ,Age ",agevec[age], " Year class =",  max(object@diagnostics$year) - agevec[age] ," \n\n","source \n", sep="")
+        weights <- object@diagnostics[(object@diagnostics$age==agevec[age]) & (object@diagnostics$year== max(object@diagnostics$year)),]
         # calc surivors and scaled wts
         weights$survivors <- round(exp(weights$nhat))
         weights$scaledWts <- round(weights$w / sum(weights$w) ,3)
@@ -690,7 +693,7 @@ if(sections[7]){
 }
 if(sections[8]){
   cat(tysurvtitle)
-  for ( age in sort(unique(object@diagnostics$age))){
+  for ( age in 1:length(agevec)){
     cat(header[[age]])
     print(tysurvtext[[age]])
   }
