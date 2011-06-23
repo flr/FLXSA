@@ -1,1 +1,1 @@
-PKG_LIBS = $(shell $(R_HOME)/bin/${R_ARCH}/R --slave -e 'cat(system.file("libs", package="FLCore"))')/${R_ARCH}/FLCore.so
+PKG_LIBS = '$(shell "$(R_HOME)/bin/${R_ARCH}/R" --slave -e 'cat(system.file("libs", package="FLCore"))')${R_ARCH}/FLCore.so'
