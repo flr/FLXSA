@@ -114,9 +114,10 @@ remove(validFLXSA)	# We do not need this function any more
 ### Methods #############################################################
 FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE){
   
-   if (!is(diag.flag,"logical")) diag.flag=FALSE
+  if (!is(diag.flag,"logical")) diag.flag=FALSE
   Call <- match.call()
-	if (!inherits(stock, "FLStock"))
+	
+  if (!inherits(stock, "FLStock"))
 		stop("stock must be an 'FLStock' object!")
 	if (inherits(indices, "FLIndex"))
     indices<-FLIndices(indices)
@@ -249,7 +250,7 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
   	names(df) <- c("w", "nhat", "yrcls", "age", "year", "source")
   	for(i in 1:length(indices)){
         v <- paste("index", i)
-        df$source[df$source==v] <- slot(indices[[i]],"name")   
+        if (length(slot(indices[[i]],"name"))>0) df$source[df$source==v] <- slot(indices[[i]],"name")   
     }
 
     wts.df <-df[,c(4,5,1,6)]
@@ -275,7 +276,8 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
     res2          <- new("FLXSA")
     res2@index.var<-new('FLQuants')
     res2@index.hat<-new('FLQuants')
-    
+    res2@index    <-new('FLQuants')
+ 
     j=0
     for (i in index.names) {
        j=j+1
