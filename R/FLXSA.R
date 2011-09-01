@@ -1,8 +1,11 @@
-### FLXSA
-### This file contains code just for the core class FLXSA
-# $Id: FLXSA.R,v 1.54 2008/05/07 01:26:34 imosqueira Exp $
+# FLXSA.R - 
+# FLXSA/R/FLXSA.R
 
-### class ######################################################################
+# Copyright 2003-2011 FLR Team. Distributed under the GPL 2 or later
+# Maintainer: Iago Mosqueira, JRC
+# $Id:  $
+
+# {{{ FLXSA.control class
 validFLXSA.control <- function(object){
 	if (object@tol <= 0)
 		return("value of tol must be > 0")
@@ -60,11 +63,9 @@ setClass("FLXSA.control",
   	vpa          =FALSE),
   validity=validFLXSA.control
 )
+# }}}
 
-setValidity("FLXSA.control", validFLXSA.control)
-remove(validFLXSA.control)	# We do not need this function any more
-
-## FLXSA ######################
+# FLXSA class {{{
 validFLXSA <- function(object){
 	# All FLQuant objects must have same dimensions
 	return(TRUE)
@@ -105,141 +106,160 @@ setClass("FLXSA",
 		diagnostics=new("data.frame"),
 		control  =new("FLXSA.control")),
 	validity=validFLXSA
+) # }}}
+
+# FLXSA() {{{
+setGeneric("FLXSA", function(stock, indices, ...)
+	standardGeneric("FLXSA"))
+
+setMethod("FLXSA", signature(stock="FLStock", indices="FLIndex"),
+  function(stock, indices, control=FLXSA.control(), diag.flag=TRUE) {
+    FLXSA(stock=stock, indices=FLIndices(indices), control=control, diag.flag=diag.flag)
+  }
 )
 
-setValidity("FLXSA", validFLXSA)
-remove(validFLXSA)	# We do not need this function any more
+setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
+  function(stock, indices, control=FLXSA.control(), diag.flag=TRUE) {
+    
+    Call <- match.call()
 
-
-### Methods #############################################################
-FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE){
-  
-  if (!is(diag.flag,"logical")) diag.flag=FALSE
-  Call <- match.call()
-	
-  if (!inherits(stock, "FLStock"))
-		stop("stock must be an 'FLStock' object!")
-	if (inherits(indices, "FLIndex"))
-    indices<-FLIndices(indices)
-	if (!inherits(indices, "FLIndices"))
-  	stop("indices must be an 'FLIndices' object!")
-  for (i in 1:length(indices))
-     {
-     if (is.na(indices[[i]]@range["startf"]) || is.na(indices[[i]]@range["endf"]))
+    # check FLIndices input
+    for (i in 1:length(indices)) {
+      # startf & endf present in @range
+      if (is.na(indices[[i]]@range["startf"]) || is.na(indices[[i]]@range["endf"]))
   	     stop(paste("Must supply startf & endf for range in FLIndex",i))
+      # @range has all elements
+      if (!all(c("min","max","plusgroup","minyear","maxyear","startf","endf") %in%
+        names(indices[[i]]@range)))
+        stop("Range must have names 'min','max','plusgroup','minyear','maxyear',
+          'startf','endf'")
+      # adjust ranges to dims()
+      indices[[i]]@range["min"] <- max(indices[[i]]@range["min"], dims(indices[[i]])$min,
+        stock@range["min"])
+      indices[[i]]@range["max"] <- min(indices[[i]]@range["max"], dims(indices[[i]])$max,
+        stock@range["max"])
+      indices[[i]]@range["minyear"] <- max(indices[[i]]@range["minyear"],
+        dims(indices[[i]])$minyear, stock@range["minyear"])
+      indices[[i]]@range["maxyear"] <- min(indices[[i]]@range["maxyear"],
+        dims(indices[[i]])$maxyear, stock@range["maxyear"])
 
-      if (!all(c("min","max","plusgroup","minyear","maxyear","startf","endf") %in% names(indices[[i]]@range)))
-         stop("Range must have names 'min','max','plusgroup','minyear','maxyear','startf','endf'")
-
-      indices[[i]]@range[c("min","max","plusgroup","minyear","maxyear","startf","endf")]==indices[[i]]@range[c("min","max","plusgroup","minyear","maxyear","startf","endf")]
-      
-      indices[[i]]@range["min"]     <- max(indices[[i]]@range["min"], dims(indices[[i]])$min, stock@range["min"])
-      indices[[i]]@range["max"]     <- min(indices[[i]]@range["max"], dims(indices[[i]])$max, stock@range["max"])
-      indices[[i]]@range["minyear"] <- max(indices[[i]]@range["minyear"], dims(indices[[i]])$minyear, stock@range["minyear"])
-      indices[[i]]@range["maxyear"] <- min(indices[[i]]@range["maxyear"], dims(indices[[i]])$maxyear, stock@range["maxyear"])
-
+      # trim according to range
       age <- indices[[i]]@range["min"]:indices[[i]]@range["max"]
       year<- indices[[i]]@range["minyear"]:indices[[i]]@range["maxyear"]
       
-      indices[[i]]<-trim(indices[[i]],age=age,year=year)
-      }
-
-  	if (!is(control, "FLXSA.control"))
-  		stop("control must be an 'FLXSA.control' object!")
-  	if (!validObject(stock))
-  		stop("stock is not valid!")
+      indices[[i]] <- trim(indices[[i]], age=age, year=year)
+    }
+      
+    # Double check validity
+    if (!validObject(stock))
+  	  stop("stock is not valid!")
   	if (!validObject(indices))
-  		stop("FLIndices is not valid!")
+  	  stop("FLIndices is not valid!")
   	if (!validObject(control))
-  		stop("control is not valid!")
+  	  stop("control is not valid!")
 
-    ## check range
-    if ("minage"    %in% names(stock@range)) minage <- stock@range["minage"]   else
-    if ("min"       %in% names(stock@range)) minage <- stock@range["min"]      else
-    if ("minquant"  %in% names(stock@range)) minage <- stock@range["minquant"] else  stop("'minage' not found in range")
-
-    if ("maxage"    %in% names(stock@range)) maxage <- stock@range["maxage"]   else
-    if ("max"       %in% names(stock@range)) maxage <- stock@range["max"]      else
-    if ("maxquant"  %in% names(stock@range)) maxage <- stock@range["maxquant"] else  stop("'maxage' not found in range")
+    # adjust range for minage
+    if ("minage" %in% names(stock@range))
+      minage <- stock@range["minage"]
+    else if ("min" %in% names(stock@range))
+      minage <- stock@range["min"]
+    else if ("minquant"  %in% names(stock@range))
+      minage <- stock@range["minquant"]
+    else
+      stop("'minage' not found in range")
+      
+    # adjust range for maxage
+    if ("maxage" %in% names(stock@range))
+      maxage <- stock@range["maxage"]
+    else if ("max" %in% names(stock@range))
+      maxage <- stock@range["max"]
+    else if ("maxquant" %in% names(stock@range))
+      maxage <- stock@range["maxquant"]
+    else
+      stop("'maxage' not found in range")
     
-    if ("plusgroup" %in% names(stock@range)) stock@range["plusgroup"] <- maxage
+    # adjust plsugroup
+    if ("plusgroup" %in% names(stock@range))
+      stock@range["plusgroup"] <- maxage
 
-    if (maxage<minage | stock@range["maxyear"]<stock@range["minyear"]) stop("Error in range")
-    if (is.na(stock@range["plusgroup"])) stop("Plus Group must be specified")
+    if (maxage<minage | stock@range["maxyear"] < stock@range["minyear"])
+      stop("Error in range")
     
-    ## trim stock
-    stock   <- trim(stock, year=stock@range["minyear"]:stock@range["maxyear"])
+    if (is.na(stock@range["plusgroup"]))
+      stop("Plus Group must be specified")
+    
+    # trim stock
+    stock <- trim(stock, year=stock@range["minyear"]:stock@range["maxyear"])
 
-    if (!is.na(stock@range["plusgroup"]) & stock@range["plusgroup"] < dims(stock@catch.n)$max)
-       stock   <- setPlusGroup(stock, stock@range["plusgroup"])
+    if (!is.na(stock@range["plusgroup"]) &
+      stock@range["plusgroup"] < dims(stock@catch.n)$max)
+      stock <- setPlusGroup(stock, stock@range["plusgroup"])
 
-	  stock@m <- stock@m[as.character(minage:maxage), , , ,]
+    stock@m <- stock@m[as.character(minage:maxage),,,,]
 
-	  if (all(is.na(stock@catch.n))){
-       stop("catch.n is not available")
-       }
+    # check catch.n is available
+    if (all(is.na(stock@catch.n)))
+      stop("catch.n is not available")
 
-    stock@stock.n <- new("FLQuant")
-    stock@harvest <- new("FLQuant")
+    stock@stock.n[] <- new('FLQuant')
+    stock@harvest[] <- new('FLQuant')
 
-#    for (i in 1:length(indices))
-#      {
-#      start=max(dims(indices[[i]])$minyear,dims(stock@m)$maxyear-control@window+1)
-#      end  =min(dims(indices[[i]])$maxyear,dims(stock@m)$maxyear)
-#      indices[[i]]<-window(indices[[1]],start=start,end=end)
-#      }
+    # fqs
+    fqs <- function(assess) {
+      assess@index <- new("FLQuants", lapply(assess@index,FLQuant))
+      assess@index.hat <- new("FLQuants", lapply(assess@index.hat,FLQuant))
+      assess@index.var <- new("FLQuants", lapply(assess@index.var,FLQuant))
+      assess@index.res <- new("FLQuants", lapply(assess@index.res,FLQuant))
+      assess@q.hat <- new("FLQuants", lapply(assess@q.hat,FLQuant))
+      assess@q2.hat <- new("FLQuants", lapply(assess@q2.hat,FLQuant))
+       
+      if (validObject(assess))
+        return(assess)
+      else
+        stop("not valid")
+    }
 
-     fqs<-function(assess) {
-            assess@index <- new("FLQuants", lapply(assess@index,FLQuant))
-            assess@index.hat <- new("FLQuants", lapply(assess@index.hat,FLQuant))
-            assess@index.var <- new("FLQuants", lapply(assess@index.var,FLQuant))
-            assess@index.res <- new("FLQuants", lapply(assess@index.res,FLQuant))
-            assess@q.hat <- new("FLQuants", lapply(assess@q.hat,FLQuant))
-            assess@q2.hat <- new("FLQuants", lapply(assess@q2.hat,FLQuant))
-            if (validObject(assess))
-                return(assess)
-            else stop("not valid")
-        }
-
+    #
     iters.stock  <-max(unlist(qapply(stock, function(x) dims(x)$iter)))
-    iters.indices<-max(unlist(lapply(indices@.Data, function(x) max(unlist(qapply(x, function(x2) dims(x2)$iter))))))
-    
+    iters.indices<-max(unlist(lapply(indices@.Data,
+      function(x) max(unlist(qapply(x, function(x2) dims(x2)$iter))))))
+      
+    if ((iters.stock>1 && iters.indices>1) && missing(diag.flag))
+      diag.flag <- FALSE
+
     if ((iters.stock>1 && iters.indices>1) && diag.flag)
-       return("Multiple iters only allowed if diag.flag=FALSE")
+      return("Multiple iters only allowed if diag.flag=FALSE")
 
-    if(!diag.flag) 
-       {
-       res<-.Call("FLXSA", iter(stock,1), lapply(indices, iter,1), control, FALSE)
+    if(!diag.flag) {
+       
+      res<-.Call("FLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
+      iters <- max(iters.stock,iters.indices)
+       
+      if (iters>1) {
+          
+        res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
+        res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
+        for (i in as.character(2:iters)) {
+          res. <- .Call("FLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
+          iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
+          iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
+        }
+      }       
 
-       iters<-max(iters.stock,iters.indices)
-       if (iters>1)
-           {
-           res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
-           res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
+      res@harvest@units <- "f"
 
-           for (i in as.character(2:iters))
-              {
-              res.              <-.Call("FLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
-              #res.              <-FLXSA(iter(stock,i), lapply(indices, iter,i), control, diag.flag)
-              iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
-              iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
-              }
-           }       
+      return(res)
+    }
 
-       res@harvest@units <- "f"
-
-       return(res)
-       }
-    
     res <-.Call("FLXSA", stock, indices, control, diag.flag)
 
     res <-fqs(.Call("FLXSA", stock, indices, control, diag.flag))
-    if (class(res) != "FLXSA") return(res)
-	     res@call <- as.character(Call)
+      
+    if (class(res) != "FLXSA")
+      return(res)
+    res@call <- as.character(Call)
 
-	  if (!missing(desc)) res@desc <- as.character(desc)
-
-    ## put wts amd nhats into a data frame
+    # put wts amd nhats into a data frame
     df <- as.data.frame(res@wts)
     df1 <- (df[4])
     df1[df1 >= 1, 1] <- paste("index", df1[df1 >= 1, 1])
@@ -247,10 +267,12 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
     df1[df1 == -2, 1] <- "nshk"
     df <- cbind(df[-4], df1)
 
-  	names(df) <- c("w", "nhat", "yrcls", "age", "year", "source")
-  	for(i in 1:length(indices)){
-        v <- paste("index", i)
-        if (length(slot(indices[[i]],"name"))>0) df$source[df$source==v] <- slot(indices[[i]],"name")   
+    names(df) <- c("w", "nhat", "yrcls", "age", "year", "source")
+  	
+    for(i in 1:length(indices)) {
+      v <- paste("index", i)
+      if (length(slot(indices[[i]],"name"))>0)
+         df$source[df$source==v] <- slot(indices[[i]],"name")   
     }
 
     wts.df <-df[,c(4,5,1,6)]
@@ -261,93 +283,85 @@ FLXSA <- function(stock, indices, control=FLXSA.control(), desc, diag.flag=TRUE)
     index.names<-sort(unique(df[,"source"]))
     index.names<-index.names[substr(index.names,1,5)=="index"]
   
-    fill.flq<-function(obj){
-        dms <-dims(obj)
-        dmns<-dimnames(obj)
-        dmns[[1]]<-dms[[2]]:dms[[3]]
-        dmns[[2]]<-dms[[5]]:dms[[6]]
+    fill.flq<-function(obj) {
+      dms <-dims(obj)
+      dmns<-dimnames(obj)
+      dmns[[1]]<-dms[[2]]:dms[[3]]
+      dmns[[2]]<-dms[[5]]:dms[[6]]
         
-        res<-as.FLQuant(NA,dimnames=dmns)
-        res[dimnames(obj)[[1]],dimnames(obj)[[2]],,,]<-obj[dimnames(obj)[[1]],dimnames(obj)[[2]],,,]
+      res<-as.FLQuant(NA,dimnames=dmns)
+      res[dimnames(obj)[[1]],dimnames(obj)[[2]],,,]<-obj[dimnames(obj)[[1]],
+        dimnames(obj)[[2]],,,]
         
-        return(res)
-        }
+      return(res)
+    }
           
-    res2          <- new("FLXSA")
+    res2  <- new("FLXSA")
     res2@index.var<-new('FLQuants')
     res2@index.hat<-new('FLQuants')
     res2@index    <-new('FLQuants')
  
     j=0
+    
     for (i in index.names) {
-       j=j+1
-       res2@index.var[[j]]<-1.0/fill.flq(as.FLQuant(wts.df[wts.df[,  "source"]==i,-4]))
-       res2@index.hat[[j]]<-    fill.flq(as.FLQuant(nhat.df[nhat.df[,"source"]==i,-4]))
-       res2@index.var[[j]]<-1.0/as.FLQuant(wts.df[wts.df[,  "source"]==i,-4])
-       res2@index.hat[[j]]<-as.FLQuant(nhat.df[nhat.df[,"source"]==i,-4])
+      j=j+1
+      res2@index.var[[j]]<-1.0/fill.flq(as.FLQuant(wts.df[wts.df[,  "source"]==i,-4]))
+      res2@index.hat[[j]]<-    fill.flq(as.FLQuant(nhat.df[nhat.df[,"source"]==i,-4]))
+      res2@index.var[[j]]<-1.0/as.FLQuant(wts.df[wts.df[,  "source"]==i,-4])
+      res2@index.hat[[j]]<-as.FLQuant(nhat.df[nhat.df[,"source"]==i,-4])
+      dmns <- dimnames(res2@index.hat[[j]])
+      index  <- trim(indices[[j]]@index,age=dmns$age,year=dmns$year)
 
-       dmns                        <-dimnames(res2@index.hat[[j]])
-       index                       <-trim(indices[[j]]@index,age=dmns$age,year=dmns$year)
+      res2@index[    is.na(index)]<-NA
+      res2@index.hat[is.na(index)]<-NA
+      res2@index.var[is.na(index)]<-NA
+      res2@index.res[is.na(index)]<-NA
+    }
 
-       #print(index)
-       res2@index[    is.na(index)]<-NA
-       res2@index.hat[is.na(index)]<-NA
-       res2@index.var[is.na(index)]<-NA
-       res2@index.res[is.na(index)]<-NA
-       }
-    #names(wts) <-index.names
-    #names(nhat)<-index.names
+    # F shrinkage
+    fshk  <- df[df[,"source"]=="fshk",]
 
-#    if (any(unique(df[,"source"])=="fshk")){
-#       res2@var.fshk<-1.0/fill.flq(as.FLQuant(wts.df[wts.df[,  "source"]=="fshk",-4]))
-#       res2@n.fshk  <-    fill.flq(as.FLQuant(nhat.df[nhat.df[,"source"]=="fshk",-4]))
-#       }
+    if (length(fshk[,1])>0) {
+      y.range <- range(fshk[,"year"])
+      a.range<-range(fshk[,"age"])
+      max.yr <-fshk[fshk[,"age"] ==a.range[2],]
+      max.age<-fshk[fshk[,"year"]==y.range[2],]
 
-#    if (any(unique(df[,"source"])=="nshk")){
-#       res2@var.nshk<-1.0/fill.flq(as.FLQuant(wts.df[wts.df[,  "source"]=="nshk",-4]))
-#       res2@n.nshk  <-    fill.flq(as.FLQuant(nhat.df[nhat.df[,"source"]=="nshk",-4]))
-#       }
+      res2@n.fshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],
+          year=y.range[1]:y.range[2]))
+      res2@n.fshk[as.character(max.age[,"age"]),as.character(y.range[2])]<-max.age[,
+        "nhat"]
+      res2@n.fshk[as.character(a.range[2]),as.character(max.yr[,"year"])]<-max.yr[,"nhat"]
 
-## F shrinkage
-fshk   <-df[df[,"source"]=="fshk",]
-if (length(fshk[,1])>0)
-  {
-  y.range<-range(fshk[,"year"])
-  a.range<-range(fshk[,"age"])
-  max.yr <-fshk[fshk[,"age"] ==a.range[2],]
-  max.age<-fshk[fshk[,"year"]==y.range[2],]
+      res2@var.nshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],
+          year=y.range[1]:y.range[2]))
+      res2@var.nshk[as.character(max.age[,"age"]),as.character(y.range[2])]<-
+        1/max.age[,"w"]
+      res2@var.nshk[ as.character(a.range[2]),as.character(max.yr[,"year"])]<-
+        1/max.yr[,"w"]
+    }
 
-  res2@n.fshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],year=y.range[1]:y.range[2]))
-  res2@n.fshk[as.character(max.age[,"age"]),as.character(y.range[2])]<-max.age[,"nhat"]
-  res2@n.fshk[as.character(a.range[2]),as.character(max.yr[,"year"])]<-max.yr[,"nhat"]
+    # N shrinkage
+    nshk   <-df[df[,"source"]=="nshk",]
+    if (length(nshk[,1])>0) {
+      y.range<-range(nshk[,"year"])
+      a.range<-range(nshk[,"age"])
+      max.yr <-nshk[nshk[,"age"] ==a.range[2],]
+      max.age<-nshk[nshk[,"year"]==y.range[2],]
 
-  res2@var.nshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],year=y.range[1]:y.range[2]))
-  res2@var.nshk[as.character(max.age[,"age"]),as.character(y.range[2])]<-1/max.age[,"w"]
-  res2@var.nshk[ as.character(a.range[2]),as.character(max.yr[,"year"])]<-1/max.yr[,"w"]
-  }
+      res2@n.nshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],
+          year=y.range[1]:y.range[2]))
+      res2@n.nshk[,as.character(y.range[2])] <- max.age[,"nhat"]
+      res2@n.nshk[ as.character(a.range[2])] <- max.yr[,"nhat"]
 
-## N shrinkage
-nshk   <-df[df[,"source"]=="nshk",]
-if (length(nshk[,1])>0)
-  {
-  y.range<-range(nshk[,"year"])
-  a.range<-range(nshk[,"age"])
-  max.yr <-nshk[nshk[,"age"] ==a.range[2],]
-  max.age<-nshk[nshk[,"year"]==y.range[2],]
-
-  res2@n.nshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],year=y.range[1]:y.range[2]))
-  res2@n.nshk[,as.character(y.range[2])]<-max.age[,"nhat"]
-  res2@n.nshk[ as.character(a.range[2])]<-max.yr[,"nhat"]
-
-  res2@var.nshk  <-as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],year=y.range[1]:y.range[2]))
-  res2@var.nshk[,as.character(y.range[2])]<-1/max.age[,"w"]
-  res2@var.nshk[ as.character(a.range[2])]<-1/max.yr[,"w"]
-  }
+      res2@var.nshk <- as.FLQuant(NA,dimnames=list(age=a.range[1]:a.range[2],
+          year=y.range[1]:y.range[2]))
+      res2@var.nshk[,as.character(y.range[2])]<-1/max.age[,"w"]
+      res2@var.nshk[ as.character(a.range[2])]<-1/max.yr[,"w"]
+    }
 
     res2@diagnostics<- df
     res2@index.hat  <- res@index.hat
-    #res2@index.hat  <- nhat
-    #res2@index.var  <- wts
     res2@stock.n    <- FLQuant(res@stock.n@.Data)
     res2@harvest    <- FLQuant(res@harvest@.Data)
     res2@survivors  <- FLQuant(res@survivors@.Data)
@@ -369,19 +383,25 @@ if (length(nshk[,1])>0)
     res2@q.hat      <-FLQuants(res@q.hat)    
     res2@q2.hat     <-FLQuants(res@q2.hat)   
 
-    for (i in 1:length(indices))
-       {
+    for (i in 1:length(indices)) {
        res2@index.range[[i]]<-indices[[i]]@range
        res2@index.name[i]   <-indices[[i]]@name
        res2@index[[i]]      <-res@index[[i]]
-       res2@index.hat[[i]]  <-FLQuant(res@index.hat[[i]], dimnames=dimnames(res@index.hat[[i]]))
-       res2@index.res[[i]]  <-FLQuant(res@index.res[[i]], dimnames=dimnames(res@index.res[[i]]))
-       res2@index.var[[i]]  <-FLQuant(res@index.var[[i]], dimnames=dimnames(res@index.var[[i]]))
-       res2@q.hat[[i]]      <-FLQuant(res@q.hat[[i]],     dimnames=dimnames(res@q.hat[[i]]))
-       res2@q2.hat[[i]]     <-FLQuant(res@q2.hat[[i]],    dimnames=dimnames(res@q2.hat[[i]]))
+       res2@index.hat[[i]]  <-FLQuant(res@index.hat[[i]],
+         dimnames=dimnames(res@index.hat[[i]]))
+       res2@index.res[[i]]  <-FLQuant(res@index.res[[i]],
+         dimnames=dimnames(res@index.res[[i]]))
+       res2@index.var[[i]]  <-FLQuant(res@index.var[[i]],
+         dimnames=dimnames(res@index.var[[i]]))
+       res2@q.hat[[i]]      <-FLQuant(res@q.hat[[i]],
+         dimnames=dimnames(res@q.hat[[i]]))
+       res2@q2.hat[[i]]     <-FLQuant(res@q2.hat[[i]],
+        dimnames=dimnames(res@q2.hat[[i]]))
 
        dmns<-dimnames(indices[[i]]@index)
-       na. <-is.na(indices[[i]]@index[dmns$age[ dmns$age  %in% dimnames(res2@index[[i]])$age],dmns$year[dmns$year %in% dimnames(res2@index[[i]])$year]])
+       na. <-is.na(indices[[i]]@index[
+           dmns$age[dmns$age %in% dimnames(res2@index[[i]])$age],
+           dmns$year[dmns$year %in% dimnames(res2@index[[i]])$year]])
        
        res2@index[[i]][na.] <- NA
        res2@index.hat[[i]][na.]<- NA
@@ -405,8 +425,8 @@ if (length(nshk[,1])>0)
        dimnames(res2@index.res[[i]])$area   <-dimnames(indices[[i]]@index)$area
        dimnames(res2@index.var[[i]])$area   <-dimnames(indices[[i]]@index)$area
        dimnames(res2@q.hat[[i]])$area       <-dimnames(indices[[i]]@index)$area
-       dimnames(res2@q2.hat[[i]])$area      <-dimnames(indices[[i]]@index)$area
-       }
+       dimnames(res2@q2.hat[[i]])$area      <-dimnames(indices[[i]]@index)$area   
+    }
 
     res2@control <- res@control
     res2@call    <- res@call
@@ -420,7 +440,10 @@ if (length(nshk[,1])>0)
 
 	  return(res2)
     }
-    
+)
+# }}}
+
+# FLXSA.control{{{
 FLXSA.control <- function(x=NULL, tol=10e-10, maxit=30, min.nse=0.3, fse=0.5, rage=0, qage=10, shk.n=TRUE,
                         	shk.f=TRUE, shk.yrs=5, shk.ages=5, window=100, tsrange=20, tspower=3, vpa=FALSE){
 	if (is.null(x)){
@@ -479,7 +502,9 @@ FLXSA.control <- function(x=NULL, tol=10e-10, maxit=30, min.nse=0.3, fse=0.5, ra
 
 	return(res)
   }
+# }}}
 
+# assess {{{
 setMethod("assess", signature(control="FLXSA.control"),
    function(control, stock, indices, ...){
 
@@ -491,10 +516,12 @@ setMethod("assess", signature(control="FLXSA.control"),
    FLXSA(stock,indices,control)   
    }
 )
+# }}}
 
-# Test if an object is of FLXSA class
+# is.FLXSA {{{
 is.FLXSA <- function(x)
 	return(inherits(x, "FLXSA"))
+# }}}
 
 # Test if an object is of FLXSA.control class
 is.FLXSA.control <- function(x)
