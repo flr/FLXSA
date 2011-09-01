@@ -1,0 +1,5 @@
+		CHANGES IN FLXSA VERSION 2.1
+
+USER-VISIBLE CHANGES
+  - FLXSA is now a method, available for both FLIndices and FLIndex. diag.flag set to
+    FALSE if missing and iters>1
