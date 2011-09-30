@@ -14,10 +14,10 @@
 
 .onLoad <- function(lib,pkg) {
 	require(methods)
-	cat("FLXSA 2.4 \n")
-	cat("This package is not maintained anymore.\n")
-	cat("Would YOU like the job?\n")
-	cat("------------------------------------\n")
+#	cat("FLXSA 2.5 \n")
+#	cat("This package is not maintained anymore.\n")
+#	cat("Would YOU like the job?\n")
+#	cat("------------------------------------\n")
 
 
 }
