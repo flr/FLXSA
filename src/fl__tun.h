@@ -1,8 +1,8 @@
 #ifndef _INC_fl__tun
 #define _INC_fl__tun
 
-#include "fl__types.hpp"
-#include "flalloc.hpp"
+#include "fl__types.h"
+#include "flalloc.h"
                                     
 #define MAXNFLEETS  16
 #define FLEETSTRLEN 32       

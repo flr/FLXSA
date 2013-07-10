@@ -1,8 +1,8 @@
 #ifndef _INC_fl__ctc
 #define _INC_fl__ctc
 
-#include "fl__types.hpp"
-#include "flalloc.hpp"
+#include "fl__types.h"
+#include "flalloc.h"
 
 class CatchData
 {

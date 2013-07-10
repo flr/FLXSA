@@ -1,8 +1,8 @@
 //
-// flrxsa.hpp
+// flrxsa.h
 //
-// Last Change: 10 Ago 2005 11:44
-// $Id: flrxsa.hpp,v 1.10 2007/10/22 09:29:13 ltkell Exp $
+// Last Change: Wed Jul 10, 2013 at 02:22 PM +0200
+// $Id: flrxsa.h,v 1.10 2007/10/22 09:29:13 ltkell Exp $
 
 #ifndef _INC_flrxsa
 #define _INC_flrxsa
@@ -10,8 +10,8 @@
 #include "math.h"
 #include <stdio.h>
 
-#include "fl__r.hpp"
-#include "fl__xsa.hpp"
+#include "fl__r.h"
+#include "fl__xsa.h"
 
 #define NXSAPARAMS  15
  

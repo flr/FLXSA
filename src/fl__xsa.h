@@ -2,10 +2,10 @@
 #define _INC_fl__xsa
 
 #include <math.h>
-#include "fl__types.hpp"
-#include "fl__ctc.hpp"
-#include "fl__tun.hpp"
-#include "fl__vpa.hpp"
+#include "fl__types.h"
+#include "fl__ctc.h"
+#include "fl__tun.h"
+#include "fl__vpa.h"
 
 #define NSE_WTS_AUTOMATIC 0
 #define NSE_WTS_MANUAL    1

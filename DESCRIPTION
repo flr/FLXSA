@@ -5,4 +5,4 @@ Version: 2.5
 Description: Recreates stock numbers at age from commercial catch data
 Maintainer: Nobody <dev@null.org>
 License: GPL 2.0
-Depends: methods, FLCore(>= 2.5), FLAssess(>= 2.5)
+Depends: methods, FLCore(>= 2.5), FLAssess(>= 2.5), FLash(>= 2.5)

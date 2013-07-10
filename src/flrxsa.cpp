@@ -1,10 +1,10 @@
 //
 // flxrsa.cpp
 //
-// Last Change: 28 Apr 2010 15:01
+// Last Change: Wed Jul 10, 2013 at 02:21 PM +0200
 // $Id: flrxsa.cpp,v 1.11 2007/10/22 09:25:31 ltkell Exp $
 
-#include "flrxsa.hpp"
+#include "flrxsa.h"
 
 ExtendedSurvivorsAnalysisR::ExtendedSurvivorsAnalysisR(SEXP xControl, SEXP xM, CatchData *pCatchData, TuningFleets *pTuningFleets)
    {                   

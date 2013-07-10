@@ -8,7 +8,7 @@
    #define SEXPDLLExport SEXP    
 #endif
 
-#include "flrxsa.hpp"
+#include "flrxsa.h"
 
 extern "C" SEXPDLLExport FLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags) 
    {

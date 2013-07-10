@@ -2,7 +2,7 @@
 #define _INC_flalloc
                     
 #include <malloc.h>  
-#include "fl__types.hpp"
+#include "fl__types.h"
 
 #define MALLOC   malloc
 #define FREE     free

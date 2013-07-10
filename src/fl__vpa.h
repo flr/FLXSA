@@ -1,8 +1,8 @@
 #ifndef _INC_fl__vpa
 #define _INC_fl__vpa
                            
-#include "fl__types.hpp"
-#include "fl__ctc.hpp"
+#include "fl__types.h"
+#include "fl__ctc.h"
 
 #define VPA_TOL     1e-6
 #define SEPVPA_TOL  1e-40

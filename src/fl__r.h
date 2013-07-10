@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
-#include "fl__types.hpp"
-#include "flalloc.hpp"
+#include "fl__types.h"
+#include "flalloc.h"
 
 int  NElemList(SEXP);
 bool InputRange(SEXP, int *, int *, int *, int *, int *);
