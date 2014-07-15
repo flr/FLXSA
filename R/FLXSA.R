@@ -608,25 +608,25 @@ setMethod("diagnostics", signature(object="FLXSA"),
     regWt <- FLQuant(dimnames=list(age = 'all', year = yr.range))
     for(y in yr.range) 
       regWt[,as.character(y)] <- (1-((max(yr.range)-y)/control@tsrange)^control@tspower)^control@tspower
-    regwts <- matrix(round(regWt,3),dims(regWt)$age,dimnames=list(age="all",year=yr.range))
+    regwts <- matrix(round(c(regWt),3),dims(regWt)$age,dimnames=list(age="all",year=yr.range))
 # cat(regwtstitle)
 # print(regwts)
 
     FMtitle <- "\n\n Fishing mortalities\n"
-    FM      <- matrix(round(trim(object@harvest,year=yr.range),3), dims(object@harvest)$age,
+    FM      <- matrix(round(c(trim(object@harvest,year=yr.range)),3), dims(object@harvest)$age,
         dimnames=list(age=dims(object@harvest)$min:dims(object@harvest)$max, year=yr.range))
 # cat(FMtitle)
 # print(FM)
 
     PNtitle <- "\n\n XSA population number (Thousand)\n"
-    PN <- (t(matrix(round(trim(object@stock.n,year=yr.range),0), dims(object@stock.n)$age,
+    PN <- (t(matrix(round(c(trim(object@stock.n,year=yr.range)),0), dims(object@stock.n)$age,
         dimnames=list(age=dims(object@stock.n)$min:dims(object@stock.n)$max, year=yr.range))))
 # cat(PNtitle)
 # print(PN)
 
     nextyear  <- dims(object@survivors)$maxyear
     survtitle <- paste("\n\n Estimated population abundance at 1st Jan ",nextyear,"\n")
-    survivors <- t(matrix(round(object@survivors[,as.character(nextyear)]),
+    survivors <- t(matrix(round(c(object@survivors[,as.character(nextyear)])),
         dimnames=list(age=dims(object@survivors)$min:dims(object@survivors)$max, year=nextyear)))
 # cat(survtitle)
 # print(survivors)
@@ -639,7 +639,7 @@ setMethod("diagnostics", signature(object="FLXSA"),
 
     for (f in 1:length(object@index)) {
         fleetname[[f]] <- paste("\n\n Fleet: ",indices[[f]]@name,"\n\n","Log catchability residuals.\n\n")
-        logQs[[f]] <- matrix(round(object@index.res[[f]],3), nrow=dims(object@index.res[[f]])$age,
+        logQs[[f]] <- matrix(round(c(object@index.res[[f]]),3), nrow=dims(object@index.res[[f]])$age,
             dimnames=list(age=dimnames(object@index.res[[f]])$age, year=dimnames(object@index.res[[f]])$year))
 
 #       print(fleetname[[f]])
@@ -649,8 +649,8 @@ setMethod("diagnostics", signature(object="FLXSA"),
           mlqbtitle[[f]] <- paste("\n\n Mean log catchability and standard error of ages with catchability \n",
               "independent of year class strength and constant w.r.t. time \n\n")
 
-          q.tab <- rbind(Mean_Logq=round(log(object@q.hat[[f]]),4), S.E_Logq=round(sd(matrix(object@index.res[[f]],
-              dim(object@index.res[[f]])[2],dim(object@index.res[[f]])[1],byrow=T),na.rm=T),4))
+          q.tab <- rbind(Mean_Logq=round(c(log(object@q.hat[[f]])),4), S.E_Logq=round(c(sd(matrix(object@index.res[[f]],
+              dim(object@index.res[[f]])[2],dim(object@index.res[[f]])[1],byrow=T),na.rm=T)),4))
           colnames(q.tab) <- dimnames(object@q.hat[[f]])$age
 
           if (dims(object@index[[f]])$min <= control@rage ) {
@@ -678,8 +678,8 @@ setMethod("diagnostics", signature(object="FLXSA"),
         header[[age]] <- paste("\n ,Age ",agevec[age], " Year class =",  max(object@diagnostics$year) - agevec[age] ," \n\n","source \n", sep="")
         weights <- object@diagnostics[(object@diagnostics$age==agevec[age]) & (object@diagnostics$year== max(object@diagnostics$year)),]
         # calc surivors and scaled wts
-        weights$survivors <- round(exp(weights$nhat))
-        weights$scaledWts <- round(weights$w / sum(weights$w) ,3)
+        weights$survivors <- round(c(exp(weights$nhat)))
+        weights$scaledWts <- round(c(weights$w / sum(weights$w)) ,3)
         row.names(weights) <- weights$source
         tysurvtext[[age]] <- weights[ ,c("scaledWts","survivors","yrcls") ]
 
