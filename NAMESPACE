@@ -13,4 +13,5 @@ exportMethods(
     "show",
     "assess",
     "diagnostics",
+		"rand",
     "summary")
