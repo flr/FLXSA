@@ -6,5 +6,8 @@ Date: 20140808
 Description: Creates stock numbers at age from commercial catch data
 Maintainer: Nobody <dev@null.org>
 License: GPL-2
-Depends: FLCore(>= 2.5), FLAssess(>= 2.5)
+Depends:
+    FLCore(>= 2.5),
+    FLAssess(>= 2.5)
 LinksTo: FLash(>= 2.5)
+RoxygenNote: 6.0.0
