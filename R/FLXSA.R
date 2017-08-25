@@ -247,9 +247,10 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       }       
 
       res@harvest@units <- "f"
-
+      
+      res@range   <- stock@range
       return(res)
-    }
+      }
 
     res <-.Call("FLXSA", stock, indices, control, diag.flag)
 
