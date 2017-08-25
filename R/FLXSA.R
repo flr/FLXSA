@@ -224,7 +224,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
     iters.indices<-max(unlist(lapply(indices@.Data,
       function(x) max(unlist(qapply(x, function(x2) dims(x2)$iter))))))
       
-    if ((iters.stock>1 && iters.indices>1) && missing(diag.flag))
+    if ((iters.stock>1 | iters.indices>1) && missing(diag.flag))
       diag.flag <- FALSE
 
     if ((iters.stock>1 && iters.indices>1) && diag.flag)
@@ -247,11 +247,12 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       }       
 
       res@harvest@units <- "f"
+      res@range <- range(stock)
 
       return(res)
     }
 
-    res <-.Call("FLXSA", stock, indices, control, diag.flag)
+    # res <-.Call("FLXSA", stock, indices, control, diag.flag)
 
     res <-fqs(.Call("FLXSA", stock, indices, control, diag.flag))
       
