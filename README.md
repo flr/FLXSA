@@ -33,6 +33,6 @@ Copyright (c) 2004-2015 The FLR Team. Released under the [GPL v2](http://www.gnu
 ## Contact
 You are welcome to:
 
-- Submit suggestions and bug-reports at: <https://github.com/flr/FLXAS/issues>
+- Submit suggestions and bug-reports at: <https://github.com/flr/FLXSA/issues>
 - Send a pull request on: <https://github.com/flr/FLXSA/>
 - Compose a friendly e-mail to: <flrteam AT flr-project.org>
