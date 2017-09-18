@@ -22,7 +22,6 @@ or download from the [FLXSA releases page](https://github.com/flr/FLXSA/releases
 ## Build Status
 [![Travis Build Status](https://travis-ci.org/flr/FLXSA.svg?branch=master)](https://travis-ci.org/flr/FLXSA)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/flr/FLXSA?branch=master&svg=true)](https://ci.appveyor.com/project/flr/FLXSA)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/FLXSA)](https://cran.r-project.org/package=FLXSA)
 
 ## Releases
 - [All release](https://github.com/flr/FLXSA/releases/)
