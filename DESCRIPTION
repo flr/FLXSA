@@ -1,10 +1,11 @@
 Package: FLXSA
 Title: eXtended Survivor Analysis for FLR
-Author: Laurence Kell
+Authors@R: c(
+  person("Iago", "Mosqueira", email = "iago.mosqueira@ec.europa.eu", role = "cre"),
+  person("Laurence T.", "Kell", email = "laurie.kell@iccat.int", role = "aut"))
 Version: 2.5.20140808
 Date: 20140808
 Description: Creates stock numbers at age from commercial catch data
-Maintainer: Nobody <dev@null.org>
 License: GPL-2
 Depends:
     FLCore(>= 2.5),
