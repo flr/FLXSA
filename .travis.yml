@@ -1,17 +1,19 @@
 # .travis.yml for R projects.
-#
-# https://travis-ci.org/flr/FLCore
-
 warnings_are_errors: false
+
+os:
+  - linux
 
 language: r
 
-matrix:
-  include:
-    - os: linux
-      r: release
+r:
+  - release
 
 sudo: false
+
+repos:
+  CRAN: https://cloud.r-project.org
+  flr: http://flr-project.org/R
 
 cache: packages
 
