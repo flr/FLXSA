@@ -1,17 +1,18 @@
-useDynLib("FLXSA")
+useDynLib("FLXSA", .registration = TRUE)
+import("methods")
 import("FLCore")
 import("FLAssess")
 exportClasses(
-    "FLXSA",
-    "FLXSA.control")
+  "FLXSA",
+  "FLXSA.control")
 export(
-    "FLXSA",
-    "FLXSA.control",
-  	"is.FLXSA",
-    "is.FLXSA.control")
+  "FLXSA",
+  "FLXSA.control",
+  "is.FLXSA",
+  "is.FLXSA.control")
 exportMethods(
-    "show",
-    "assess",
-    "diagnostics",
-		"rand",
-    "summary")
+  "show",
+  "assess",
+  "diagnostics",
+	"rand",
+  "summary")

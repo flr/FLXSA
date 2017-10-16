@@ -14,15 +14,6 @@ SEXP ReturnError(char *ErrStr)
     return Err;
     }
 
-int NElemList(SEXP x)
-   {
-   //Check that it is a list
-   if (!IS_LIST(x) || TYPEOF(x) != VECSXP) 
-      return 0;
-   else
-      return length(x);
-  }
-
 bool InputRange(SEXP _range, int *pMinAge, int *pMaxAge, int *pPlusgroup, int *pMinYear, int *pMaxYear)
     {
     int n;

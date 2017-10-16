@@ -232,7 +232,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
 
     if(!diag.flag) {
        
-      res<-.Call("FLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
+      res<-.Call("runFLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
       iters <- max(iters.stock,iters.indices)
        
       if (iters>1) {
@@ -240,7 +240,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
         res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
         res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
         for (i in as.character(2:iters)) {
-          res. <- .Call("FLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
+          res. <- .Call("runFLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
           iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
           iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
         }
@@ -252,9 +252,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       return(res)
       }
 
-    # res <-.Call("FLXSA", stock, indices, control, diag.flag)
-
-    res <-fqs(.Call("FLXSA", stock, indices, control, diag.flag))
+    res <-fqs(.Call("runFLXSA", stock, indices, control, diag.flag))
       
     if (class(res) != "FLXSA")
       return(res)
@@ -524,6 +522,7 @@ is.FLXSA <- function(x)
 	return(inherits(x, "FLXSA"))
 # }}}
 
+# is.FLXSA.control {{{
 # Test if an object is of FLXSA.control class
 is.FLXSA.control <- function(x)
 	return(inherits(x, "FLXSA.control"))
@@ -535,17 +534,9 @@ setMethod("show", signature(object="FLXSA.control"),
 	   for (i in 1:length(n.))
          cat(n.[i],"\t\t",slot(object,n.[i]),"\n")
 	}
-)
+) # }}}
 
-
-# DiagsXSA::FLXSA
-# Author     : MP, KH & JJP, EJ
-# Modified to become summary fof FLXSA
-# Updated    : RDS   11/11/10 
-# ---------------------------------------------------------------------------------
-
-
-
+# diagnostics {{{
 setGeneric("diagnostics", function(object, ...){
 	standardGeneric("diagnostics")
 	}
@@ -730,5 +721,4 @@ if(sections[8]){
 }
     invisible()
 }
-)
-
+) # }}}
