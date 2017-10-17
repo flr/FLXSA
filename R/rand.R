@@ -1,25 +1,25 @@
 #' rand
-#' @description 
-#' Uses the internal standard errors to conduct a Monte Carlo simulation of the terminal 
-#' N-at-age in the last year
-#'           
-#' @aliases 
-#' rand
 #' 
-#' @param n number of iters to generate
-#' @param mean an \code{FLXSA} object 
-#' @return sd  an \code{FLStock} object
+#' Uses the internal standard errors to conduct a Monte Carlo simulation of the
+#' terminal N-at-age in the last year
 #' 
-#' @export
+#' 
+#' @name rand
 #' @docType methods
-#' @rdname rand
-#' 
+#' @param n number of iters to generate
+#' @param mean an \code{FLXSA} object
+#' @return sd an \code{FLStock} object
 #' @examples
+#' 
 #' \dontrun{
 #' data(ple4)
 #' data(ple4.indices)
 #' xsa =FLXSA(ple4,ple4.indices)
 #' ple4=rand(100,ple4,xsa)}
+#' 
+NULL
+
+
 setGeneric('rand', function(n, mean, sd) standardGeneric('rand'))
 
 setMethod("rand", signature(n='numeric', mean="FLStock", sd="FLXSA"),

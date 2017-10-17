@@ -1,80 +1,40 @@
 # FLXSA.R - 
 # FLXSA/R/FLXSA.R
 
-# Copyright 2003-2011 FLR Team. Distributed under the GPL 2 or later
+# Copyright 2003-2017 FLR Team. Distributed under the GPL 2 or later
 # Maintainer: Iago Mosqueira, JRC
-# $Id:  $
-
-# {{{ FLXSA.control class
-validFLXSA.control <- function(object){
-	if (object@tol <= 0)
-		return("value of tol must be > 0")
-	if (object@maxit <= 0)
-		return("value of maxit must be > 0")
-	if (object@min.nse < 0)
-		return("value of min.nse must be > 0")
-	if (object@fse < 0)
-		return("value of fse must be > 0")
-	if (object@rage < -1)
-		return("value of rage must be >= -1")
-	if (object@qage < 0)
-		return("value of qage must be >= 0")
-	if (object@shk.yrs < 0)
-		return("value of shk.yrs must be >= 0")
-	if (object@shk.ages < 0)
-		return("value of shk.ages must be >= 0")
-	if (object@window <= 5)
-		return("value of window must be >= 5")                               
-
-	# Everything is fine
-	return(TRUE)
-}
-
-setClass("FLXSA.control",
-	representation(
-		tol          ="numeric",
-		maxit        ="integer",
-		min.nse      ="numeric",
-		fse          ="numeric",
-		rage         ="integer",
-		qage         ="integer",
-		shk.n        ="logical",
-		shk.f        ="logical",
-		shk.yrs      ="integer",
-		shk.ages     ="integer",
-		window       ="integer",
-  	tsrange      ="integer",
-  	tspower      ="integer",
-  	vpa          ="logical"),
-  prototype=prototype(
-    tol          =as.double(10e-10),
-  	maxit        =as.integer(30),
-  	min.nse      =as.double(0.3),
-  	fse          =as.double(0.5),
-  	rage         =as.integer(-1),
-  	qage         =as.integer(10),
-  	shk.n        =TRUE,
-  	shk.f        =TRUE,
-  	shk.yrs      =as.integer(5),
-  	shk.ages     =as.integer(5),
-  	window       =as.integer(100),
-  	tsrange      =as.integer(20),
-  	tspower      =as.integer(3),
-  	vpa          =FALSE),
-  validity=validFLXSA.control
-)
-# }}}
 
 # FLXSA class {{{
-validFLXSA <- function(object){
-	# All FLQuant objects must have same dimensions
-	return(TRUE)
-	Dim <- dim(object@stock.n)
-	if (!all(dim(object@harvest) == Dim))
-		return("n and f arrays must have same dimensions")
-	# Everything is fine
-	return(TRUE)
-}
+
+
+#' Class FLXSA
+#' 
+#' A class for the results of an XSA analysis.
+#' 
+#' 
+#' @name FLXSA-class
+#' @aliases FLXSA-class show,FLXSA-method
+#' @docType class
+#' @section Objects from the Class: Objects can be created by calls of the form
+#' \code{new("FLXSA", ...)} and are output by calls to \code{\link{FLXSA}}.
+#' @author Laurence Kell
+#' @seealso \code{\link{FLXSA}}
+#' @references Darby, C. D., and Flatman, S. 1994. Virtual Population Analysis:
+#' version 3.1 (Windows/Dos) user guide. Info. Tech. Ser., MAFF Direct. Fish.
+#' Res., Lowestoft, (1): 85pp.
+#' 
+#' Shepherd, J.G. 1992. Extended survivors analysis: an improved method for the
+#' analysis of catch-at-age data and catch-per-unit-effort data. Working paper
+#' No. 11 ICES Multi-species Assessment Working Group, June 1992, Copenhagen,
+#' Denmark. 22pp. (mimeo).
+#' 
+#' Shepherd, J.G. 1994. Prediction of yearclass strength by calibration
+#' regression analysis of multiple recruit index series. ICES J. Mar. Sci. In
+#' Prep.
+#' @keywords classes
+#' @examples
+#' 
+#' 
 
 setClass("FLXSA",
   contains='FLAssess',
@@ -104,11 +64,98 @@ setClass("FLXSA",
 		q.hat    =FLQuants(),
 		q2.hat   =FLQuants(),
 		diagnostics=new("data.frame"),
-		control  =new("FLXSA.control")),
-	validity=validFLXSA
-) # }}}
+		control  =new("FLXSA.control"))
+)
+
+setValidity("FLXSA", function(object) {
+
+	# All FLQuant objects must have same dimensions
+	return(TRUE)
+	
+  Dim <- dim(object@stock.n)
+	if (!all(dim(object@harvest) == Dim))
+		return("n and f arrays must have same dimensions")
+	
+  # Everything is fine
+	return(TRUE)
+})
+# }}}
 
 # FLXSA() {{{
+
+#' Create a new FLXSA object -run an XSA analysis-
+#' 
+#' This function runs an XSA (extended survivor analysis) and creates an FLXSA
+#' object used to analyse its results.
+#' 
+#' 
+#' Virtual population analysis and cohort analysis are essentially accountancy
+#' methods whereby a stock's historical population structure may be
+#' reconstructed from total catch data given a particular level of natural
+#' mortality. Firstly, however, numbers at age in the last year and age have to
+#' be found since both methods iterate backwards down a cohort. The main
+#' problem in many sequential age based assessment methods is therefore to
+#' estimate these terminal population numbers. In XSA these are found from the
+#' relationship between catch per unit effort (CPUE), abundance and year class
+#' strength.
+#' 
+#' Estimates of the catchability for the oldest age in an assessment, tuned by
+#' the ad hoc or XSA procedures, are directly dependent on the terminal
+#' population or F values used to initialise the underlying VPA. Catchability
+#' at the oldest age is therefore under-determined and cannot be utilised
+#' without additional information. Within the ad hoc tuning procedures the
+#' additional information is obtained by making the assumption that the
+#' exploitation pattern on the oldest ages was constant during the assessment
+#' time series. F on the oldest age in the final year is estimated as a
+#' proportion of an average of the F for preceding ages in the same year. XSA
+#' uses an alternative approach by making the assumption that fleet
+#' catchability is constant (independent of age) above a certain age. The age
+#' (constant for all fleets) is user-defined. For each fleet, the catchability
+#' value estimated at the specified age, is used to derive population abundance
+#' estimates for all subsequent ages in the fleet data set.
+#' 
+#' @param stock An FLStock object to be used for the analysis
+#' @param indices An FLIndices object holding the indices of abundance to
+#' consider in the model
+#' @param control An \code{FLXSA.control} object giving parameters of the model
+#' (see \code{\link{FLXSA.control}})
+#' @param desc A short description of this analysis
+#' @param diag.flag If TRUE returns all diagnostics, if FALSEonly returns
+#' stock.n, harvest and control
+#' @return
+#' 
+#' An \code{FLXSA} object is returned, whith slots: \item{n }{An FLQuant with
+#' the number of individuals at age} \item{f }{An FLQuant with the fishing
+#' mortality} \item{swt }{An FLQuant with the stock weight} \item{mat }{An
+#' FLQuant with the maturity indices} \item{qres }{A list with residuals for q}
+#' \item{cpue }{A list with the various cpues} \item{wts }{A list with the
+#' various weights} \item{control}{The \code{FLXSA.control} object that was
+#' used for this analysis} \item{call }{A copy of the call to run this
+#' analysis} \item{desc }{A description of the analysis}
+#' @note See \code{\link{update}} to learn how to update stock data according
+#' to an XSA analysis
+#' @author Laurence Kell and Philippe Grosjean
+#' @seealso \code{\link{FLXSA.control}}, \code{\link[FLCore]{FLStock-class}}
+#' @references Darby, C. D., and Flatman, S. 1994. Virtual Population Analysis:
+#' version 3.1 (Windows/Dos) user guide. Info. Tech. Ser., MAFF Direct. Fish.
+#' Res., Lowestoft, (1): 85pp.
+#' 
+#' Shepherd, J.G. 1992. Extended survivors analysis: an improved method for the
+#' analysis of catch-at-age data and catch-per-unit-effort data. Working paper
+#' No. 11 ICES Multi-species Assessment Working Group, June 1992, Copenhagen,
+#' Denmark. 22pp. (mimeo).
+#' 
+#' Shepherd, J.G. 1994. Prediction of yearclass strength by calibration
+#' regression analysis of multiple recruit index series. ICES J. Mar. Sci. In
+#' Prep.
+#' @keywords classes
+#' @examples
+#' 
+#' 
+#' #TO DO...
+#' 
+#' 
+
 setGeneric("FLXSA", function(stock, indices, ...)
 	standardGeneric("FLXSA"))
 
@@ -362,10 +409,14 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
     res2@diagnostics<- df
     res2@index.hat  <- res@index.hat
     res2@stock.n    <- FLQuant(res@stock.n@.Data)
+      units(res2@stock.n) <- units(stock@catch.n)
     res2@harvest    <- FLQuant(res@harvest@.Data)
     res2@survivors  <- FLQuant(res@survivors@.Data)
+      units(res2@survivors) <- units(stock@catch.n)
     res2@se.int     <- FLQuant(res@se.int@.Data)
+      units(res2@se.int) <- ""
     res2@se.ext     <- FLQuant(res@se.ext@.Data)
+      units(res2@se.ext) <- ""
     res2@n.fshk     <- FLQuant(res@n.fshk@.Data)
     res2@n.nshk     <- FLQuant(res@n.nshk@.Data)
     res2@var.fshk   <- FLQuant(res@var.fshk@.Data)
@@ -427,9 +478,22 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
        dimnames(res2@q2.hat[[i]])$area      <-dimnames(indices[[i]]@index)$area   
     }
 
+    # index
+    names(res2@index) <- names(res2@index.res) <- names(res2@index.var) <-
+     names(res2@index.hat)  <- names(res2@q2.hat) <- names(res2@q.hat) <- names(indices)
+
+   for(i in names(indices)) {
+      units(res2@index[[i]]) <- units(indices[[i]]@index)
+      units(res2@index.hat[[i]]) <- units(indices[[i]]@index)
+      units(res2@index.res[[i]]) <- ""
+      units(res2@index.var[[i]]) <- ""
+      units(res2@q.hat[[i]]) <- ""
+      units(res2@q2.hat[[i]]) <- ""
+    }
+
     res2@control <- res@control
     res2@call    <- res@call
-    res2@desc    <- res@desc
+    res2@desc    <- paste("FLXSA run:", res@desc)
     res2@range   <- stock@range
     units(res2@harvest)<-"f"
 
@@ -440,67 +504,6 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
 	  return(res2)
     }
 )
-# }}}
-
-# FLXSA.control{{{
-FLXSA.control <- function(x=NULL, tol=10e-10, maxit=30, min.nse=0.3, fse=0.5, rage=0, qage=10, shk.n=TRUE,
-                        	shk.f=TRUE, shk.yrs=5, shk.ages=5, window=100, tsrange=20, tspower=3, vpa=FALSE){
-	if (is.null(x)){
-		res <- new("FLXSA.control", tol=tol, maxit=as.integer(maxit), min.nse=min.nse, fse=fse,
-		rage=as.integer(rage), qage=as.integer(qage), shk.n=as.logical(shk.n)[1],
-		shk.f=as.logical(shk.f)[1], shk.yrs=as.integer(shk.yrs), shk.ages=as.integer(shk.ages),
-		window=as.integer(window), tsrange=as.integer(tsrange), tspower=as.integer(tspower),
-		vpa=as.logical(vpa)[1])
-	  } else {	# We reuse an FLXSA.control object embedded in an FLXSA object
-        if (!is.null(x) & !(is(x, "FLXSA") | is(x, "FLXSA.control")))
-    		  	stop("FLXSA must be an 'FLXSA' or an 'FLXSA.control' object!")
-
-        if (is(x, "FLXSA"))
-    		   res <- x@control
-        if (is(x, "FLXSA.control"))
-    		   res <- x
-        if (is.null(x))
-    		   res <- new("FLXSA.control")
-        		    
- 		   # ... and possibly redefine some of its parameters
-       if (!missing(tol))
-       		res@tol <- tol
-       if (!missing(maxit))
-    			res@maxit <- as.integer(maxit)
-    	 if (!missing(min.nse))
-    			res@min.nse <- min.nse
-   		 if (!missing(fse))
-    			res@fse <- fse
-     	 if (!missing(rage))
-    			res@rage <- as.integer(rage)
-       if (!missing(qage))
-       		res@qage <- as.integer(qage)
-       if (!missing(shk.n))
-       		res@shk.n <- as.logical(shk.n)[1]
-       if (!missing(shk.f))
-       		res@shk.f <- as.logical(shk.f)[1]
-       if (!missing(shk.yrs))
-        	res@shk.yrs <- as.integer(shk.yrs)
-       if (!missing(shk.ages))
-       		res@shk.ages <- as.integer(shk.ages)
-       if (!missing(window))
-       		res@window <- as.integer(window)
-       if (!missing(tsrange))
-       		res@tsrange <- as.integer(tsrange)
-       if (!missing(tspower))
-      		res@tspower <- as.integer(tspower)
-       if (!missing(vpa))
-      		res@vpa <- as.logical(vpa)[1]
-
-  		# Verify that this object is valid
- 	  	test <- validObject(res)
-
-		  if (!test)
-        stop("Invalid object:", test)
-	    }
-
-	return(res)
-  }
 # }}}
 
 # assess {{{
@@ -518,23 +521,31 @@ setMethod("assess", signature(control="FLXSA.control"),
 # }}}
 
 # is.FLXSA {{{
+
+
+#' is.FLXSA
+#' 
+#' These two functions return \code{code} if objects are of class FLXSA and
+#' FLXSA.control, respectively.
+#' 
+#' 
+#' @aliases is.FLXSA is.FLXSA.control
+#' @param x An object to be tested
+#' @return is.FLXSA returns \code{TRUE} if its argument is of class
+#' \code{FLXSA} (that is, has "FLXSA" amongst its classes) and FALSE otherwise.
+#' is.FLXSA.control returns \code{TRUE} if its argument is of class
+#' \code{FLXSA.control} (that is, has "FLXSA.control" amongst its classes) and
+#' FALSE otherwise.
+#' @keywords attribute
+#' @examples
+#' 
+#' xsa <- FLXSA.control()
+#' is.FLXSA.control(xsa)
+#' 
+#' @export is.FLXSA
 is.FLXSA <- function(x)
 	return(inherits(x, "FLXSA"))
 # }}}
-
-# is.FLXSA.control {{{
-# Test if an object is of FLXSA.control class
-is.FLXSA.control <- function(x)
-	return(inherits(x, "FLXSA.control"))
-
-## show (a replacement for print of S3 classes)
-setMethod("show", signature(object="FLXSA.control"),
-	function(object){
-      n.<-slotNames(object)
-	   for (i in 1:length(n.))
-         cat(n.[i],"\t\t",slot(object,n.[i]),"\n")
-	}
-) # }}}
 
 # diagnostics {{{
 setGeneric("diagnostics", function(object, ...){
@@ -542,9 +553,21 @@ setGeneric("diagnostics", function(object, ...){
 	}
 )
 
+#' XSA diagnostics
+#' 
+#' Provides the diagnostics table used in ICES WG to analyse the results of the
+#' XSA run.
+#' 
+#' 
+#' @name diagnostics-method
+#' @aliases diagnostics diagnostics-method diagnostics,FLXSA-method
+#' @docType methods
+#' @section Generic Function: \describe{ \item{call}{diagnostics(object, ...}
+#' \item{object}{An object with the results of a VPA method.} }
+#' @keywords methods
+
 setMethod("diagnostics", signature(object="FLXSA"), 
   tempfun <- function(object, sections=rep(T, 8), ...){
-#browser()
 #print(1)
     indices<-new("FLIndices")
     for (i in 1:length(object@index))
@@ -662,7 +685,6 @@ setMethod("diagnostics", signature(object="FLXSA"),
     tysurvtitle <- "\n\n Terminal year survivor and F summaries: \n "
     header      <- list()
     tysurvtext  <- list()
-#browser()
 # cat(tysurvtitle)
     agevec <- sort(unique(object@diagnostics$age))
     for ( age in 1:length(agevec)){
