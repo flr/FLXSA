@@ -1,13 +1,9 @@
-# CHANGES IN FLXSA VERSION 2.6
-
-## NEW FEATURES
-
-## USER-VISIBLE CHANGES
+# FLXSA 2.6.1
 
 ## BUG FIXES
 
-## UTILITIES
+- units of slots vin FLXSA are now correct 
 
-## DOCUMENTATION
+## USER-VISIBLE CHANGES
 
-## DEPRECATED & DEFUNCT
+- FLXSA now compiles in both 32 and 64 bit R, for Linux and Windows
