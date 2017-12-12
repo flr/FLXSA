@@ -8,13 +8,15 @@
 #define FALSE 0
 #define TRUE  1
 
-#ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
 
-#ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
 
 #define SQR(a)   ((a)*(a))
 

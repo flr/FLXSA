@@ -7,8 +7,10 @@ Version: 2.6.0
 Date: 2017-09-18
 Description: Creates stock numbers at age from commercial catch data
 License: GPL-2
+Imports:
+  methods
 Depends:
-    FLCore(>= 2.5),
-    FLAssess(>= 2.5)
-LinksTo: FLash(>= 2.5)
+  FLCore(>= 2.5),
+  FLAssess(>= 2.5)
+LinkingTo: FLash(>= 2.5)
 RoxygenNote: 6.0.1
