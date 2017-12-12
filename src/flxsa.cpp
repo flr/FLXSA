@@ -14,10 +14,10 @@ extern "C" SEXPDLLExport FLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags)
    {
    int MinAge, MaxAge, Plusgroup, MinYear, MaxYear;
 
-   char* err1 = "Error in FLXSA.control";
-   char* err2 = "Error in FLIndices";
-   char* err3 = "Error in FLXSA.control";
-   char* err4 = "Error in running XSA";
+   char* err1 = (char *)"Error in FLXSA.control";
+   char* err2 = (char *)"Error in FLIndices";
+   char* err3 = (char *)"Error in FLXSA.control";
+   char* err4 = (char *)"Error in running XSA";
 
    //Input Catch Data
    CatchDataR Catch(PROTECT(duplicate(GET_SLOT(Stock, install("catch.n"))))); 
