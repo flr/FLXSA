@@ -29,6 +29,3 @@ test_that("ple4 after XSA for 32 and 64 are equal", {
   
   expect_equal(ostk, nstk)
 })
-
-
-

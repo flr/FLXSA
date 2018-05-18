@@ -32,9 +32,6 @@
 #' regression analysis of multiple recruit index series. ICES J. Mar. Sci. In
 #' Prep.
 #' @keywords classes
-#' @examples
-#' 
-#' 
 
 setClass("FLXSA",
   contains='FLAssess',
@@ -150,10 +147,11 @@ setValidity("FLXSA", function(object) {
 #' Prep.
 #' @keywords classes
 #' @examples
+#'
+#' data(ple4)
+#' data(ple4.indices)
 #' 
-#' 
-#' #TO DO...
-#' 
+#' res <- FLXSA(ple4, ple4.indices)
 #' 
 
 setGeneric("FLXSA", function(stock, indices, ...)
@@ -542,7 +540,6 @@ setMethod("assess", signature(control="FLXSA.control"),
 #' xsa <- FLXSA.control()
 #' is.FLXSA.control(xsa)
 #' 
-#' @export is.FLXSA
 is.FLXSA <- function(x)
 	return(inherits(x, "FLXSA"))
 # }}}

@@ -10,7 +10,9 @@
 #' previous stock estimates.} \item{*.xsa.control}{The FLXSA.control object for
 #' the reference run.} \item{*.xsa.ref}{The FLXSA object obtained from the
 #' reference run.} }
-#' 
+#'
+#' @name data
+#' @rdname data
 #' @aliases cod4 cod4.indices cod4.stock cod4.f.ref cod4.n.ref her4
 #' her4.indices her4.stock her4.f.ref her4.n.ref ple7a ple7a.indices
 #' ple7a.stock ple7a.f.ref ple7a.n.ref

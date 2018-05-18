@@ -67,6 +67,10 @@
 #' attributes.
 #'
 #' @section Constructor:
+#' A construction method exists for this class that can take named arguments for
+#' any of its slots. All slots are then created to match the requirements of the
+#' class validity.
+#'
 #' @author Laurence Kell & Philippe Grosjean
 #' @seealso \link{FLComp}
 #' @keywords classes
