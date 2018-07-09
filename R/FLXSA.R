@@ -122,7 +122,6 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
   function(stock, indices, control=FLXSA.control(), diag.flag=TRUE) {
     
     Call <- match.call()
-
     # check FLIndices input
     for (i in 1:length(indices)) {
       # startf & endf present in @range
@@ -231,7 +230,6 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       return("Multiple iters only allowed if diag.flag=FALSE")
 
     if(!diag.flag) {
-       
       res<-.Call("FLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
       iters <- max(iters.stock,iters.indices)
        
