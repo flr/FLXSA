@@ -1,1 +1,2 @@
-PKG_LIBS = '$(shell "$(R_HOME)/bin/${R_ARCH}/Rterm.exe" --slave -e 'cat(system.file("libs", package="FLash"))')${R_ARCH}/FLash.dll'
+PKG_CXXFLAGS = -I../inst/include
+PKG_CFLAGS = -I../inst/include

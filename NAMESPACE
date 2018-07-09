@@ -1,4 +1,5 @@
-useDynLib("FLXSA")
+useDynLib("FLXSA", .registration = TRUE)
+import("methods")
 import("FLCore")
 import("FLAssess")
 exportClasses(
