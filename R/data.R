@@ -20,14 +20,3 @@
 #' @seealso \code{\link{FLXSA-class}},\code{\link{FLXSA.control-class}}
 #' @keywords data
 NULL
-
-
-
-
-
-
-
-
-
-
-

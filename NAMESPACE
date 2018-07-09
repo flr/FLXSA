@@ -9,7 +9,8 @@ export(
   "FLXSA",
   "FLXSA.control",
   "is.FLXSA",
-  "is.FLXSA.control")
+  "is.FLXSA.control",
+  "xsa.sa")
 exportMethods(
   "show",
   "assess",
