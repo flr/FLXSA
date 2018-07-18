@@ -6,31 +6,51 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title> Create a new FLXSA.control object  — FLXSA.control • FLXSA</title>
+<title>A class for FLXSA control options — FLXSA.control • FLXSA</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/yeti/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
+
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
+
+
+<meta property="og:title" content="A class for FLXSA control options — FLXSA.control" />
+
+<meta property="og:description" content="Runs of the FLXSA method require a number of parameter to be set. Most of them
+change the behaviour of the solution-searching algorithm
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id" />
+<meta name="twitter:card" content="summary" />
+
+
+
 <!-- mathjax -->
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
   </head>
 
   <body>
@@ -44,8 +64,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">FLXSA</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">FLXSA</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.6.2</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -71,6 +95,7 @@
   <a href="http://flr-project.org/">FLR</a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -78,75 +103,95 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1> Create a new FLXSA.control object </h1>
+    <h1>A class for FLXSA control options</h1>
+    
+    <div class="hidden name"><code>FLXSA.control.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
-    <p>This function creates a new control object required by XSA model (extended survivors analysis).</p>
+    <p>Runs of the FLXSA method require a number of parameter to be set. Most of them
+change the behaviour of the solution-searching algorithm
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend
+odio ac rutrum luctus. Aenean placerat porttitor commodo. Pellentesque eget porta
+libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique. 
+Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id</p>
     
+    </div>
 
-    <pre><span class='fu'>FLXSA.control</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-09</span>, <span class='kw'>maxit</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>min.nse</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>fse</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-    <span class='kw'>rage</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>qage</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>shk.n</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>shk.f</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>shk.yrs</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-    <span class='kw'>shk.ages</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>tsrange</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>tspower</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>vpa</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <dl class="dl-horizontal">
-      <dt>x</dt>
-      <dd> An object of class FLXSA. If provided, the &#39;FLXSA.control&#39; is initialized
-    with the corresponding values of an XSA analysis stored in the object. This is useful
-    for getting the same initial parameters for successive analyses. Specifying one or
-    more of the other arguments supersedes default values, or values obtained from this
-    FLXSA object</dd>
-      <dt>tol</dt>
-      <dd> The covergence tolerance, i.e. difference between two successive iterations
-    must be lower, to declare convergence of the model.</dd>
-      <dt>maxit</dt>
-      <dd> The maximum number of iterations allowed </dd>
-      <dt>min.nse</dt>
-      <dd> The minimum value of SE permitted in estimate of N hat </dd>
-      <dt>fse</dt>
-      <dd> User set SE of F when shrinking to mean F </dd>
-      <dt>rage</dt>
-      <dd> The oldest age for which the two parameter model is used for catchability at age. Note that this value should be one less than the value used in the executable version of XSA </dd>
-      <dt>qage</dt>
-      <dd> The age after which catchability is no longer estimated. q at older ages set
-    to the value at this age </dd>
-      <dt>shk.n</dt>
-      <dd> If <code>TRUE</code>, shrinkage to mean N </dd>
-      <dt>shk.f</dt>
-      <dd> If <code>TRUE</code>, shrinkage to mean F </dd>
-      <dt>shk.yrs</dt>
-      <dd> The number of years to be used for shrinkage to F for terminal year </dd>
-      <dt>shk.ages</dt>
-      <dd> The number of ages to be used for shrinkage to F for terminal age </dd>
-      <dt>window</dt>
-      <dd> The time window to consider in the model </dd>
-      <dt>tsrange</dt>
-      <dd> The number of years to be used in the time series weighting </dd>
-      <dt>tspower</dt>
-      <dd> The power to be used in the time series taper weighting </dd>
-      <dt>vpa</dt>
-      <dd> If <code>FALSE</code> use cohort analysis, otherwise, use VPA </dd>
-    </dl>
-    
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <pre class="usage"><span class='fu'>FLXSA.control</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-09</span>, <span class='kw'>maxit</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>min.nse</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
+  <span class='kw'>fse</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>rage</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>qage</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>shk.n</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>shk.f</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>shk.yrs</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>shk.ages</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>tsrange</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>tspower</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+  <span class='kw'>vpa</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+        
+    <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
-    <p>See <code><a href='FLXSA.html'>FLXSA</a></code> for more details about the method and some bibliographical references.</p>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <dl class='dl-horizontal'>
+<dt><code>x</code></dt><dd><p>An object of class FLXSA. If provided, the 'FLXSA.control' is
+initialized with the corresponding values of an XSA analysis stored in the
+object. This is useful for getting the same initial sloteters for
+successive analyses. Specifying one or more of the other arguments
+supersedes default values, or values obtained from this FLXSA object</p></dd>
+    <dt><code>tol</code></dt><dd><p>The covergence tolerance, i.e. difference between two successive
+iterations must be lower, to declare convergence of the model.</p></dd>
+    <dt><code>maxit</code></dt><dd><p>The maximum number of iterations allowed</p></dd>
+    <dt><code>min.nse</code></dt><dd><p>The minimum value of SE permitted in estimate of N hat</p></dd>
+    <dt><code>fse</code></dt><dd><p>User set SE of F when shrinking to mean F</p></dd>
+    <dt><code>rage</code></dt><dd><p>The oldest age for which the two parameter model is used for
+catchability at age. Note that this value should be one less than the value
+used in the executable version of XSA</p></dd>
+    <dt><code>qage</code></dt><dd><p>The age after which catchability is no longer estimated. q at
+older ages set to the value at this age</p></dd>
+    <dt><code>shk.n</code></dt><dd><p>If <code>TRUE</code>, shrinkage to mean N</p></dd>
+    <dt><code>shk.f</code></dt><dd><p>If <code>TRUE</code>, shrinkage to mean F</p></dd>
+    <dt><code>shk.yrs</code></dt><dd><p>The number of years to be used for shrinkage to F for
+terminal year</p></dd>
+    <dt><code>shk.ages</code></dt><dd><p>The number of ages to be used for shrinkage to F for
+terminal age</p></dd>
+    <dt><code>window</code></dt><dd><p>The time window to consider in the model</p></dd>
+    <dt><code>tsrange</code></dt><dd><p>The number of years to be used in the time series weighting</p></dd>
+    <dt><code>tspower</code></dt><dd><p>The power to be used in the time series taper weighting</p></dd>
+    <dt><code>vpa</code></dt><dd><p>If <code>FALSE</code> use cohort analysis, otherwise, use VPA</p></dd>
+</dl>
+    
+    <h2 class="hasAnchor" id="validity"><a class="anchor" href="#validity"></a>Validity</h2>
 
-    <p>An <code>FLXSA.control</code> object with same slots as the arguments of the function (except <code>FLXSA</code>)</p>
+    
+    <p></p><dl class='dl-horizontal'>
+    <dt>VALIDITY</dt><dd><p>Neque porro quisquam est qui dolorem ipsum.</p></dd>
+</dl>
+    <p>You can inspect the class validity function by using
+   <code>getValidity(getClassDef('FLCatch'))</code></p>
+    
+    <h2 class="hasAnchor" id="accessors"><a class="anchor" href="#accessors"></a>Accessors</h2>
+
+    
+    <p>All slots in the class have accessor and replacement methods defined that
+allow retrieving and substituting individual slots.</p>
+<p>The values passed for replacement need to be of the class of that slot.
+A numeric vector can also be used when replacing FLQuant slots, and the
+vector will be used to substitute the values in the slot, but not its other
+attributes.</p>
+    
+    <h2 class="hasAnchor" id="constructor"><a class="anchor" href="#constructor"></a>Constructor</h2>
+
+    
+    <p>A construction method exists for this class that can take named arguments for
+any of its slots. All slots are then created to match the requirements of the
+class validity.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='FLXSA.html'>FLXSA</a></code></p>
+    <div class='dont-index'><p>FLComp</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>        <span class='co'># To create a new FLXSA.control object with default parameters:</span>
+    <pre class="examples"><div class='input'>
+        <span class='co'># To create a new FLXSA.control object with default parameters:</span>
         <span class='no'>my.xsa.control</span> <span class='kw'>&lt;-</span> <span class='fu'>FLXSA.control</span>()
         <span class='no'>my.xsa.control</span></div><div class='output co'>#&gt; tol 		 1e-09 
 #&gt; maxit 		 30 
@@ -176,16 +221,20 @@
 #&gt; window 		 100 
 #&gt; tsrange 		 20 
 #&gt; tspower 		 3 
-#&gt; vpa 		 FALSE </div></pre>
+#&gt; vpa 		 FALSE </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#details">Details</a></li>
+      <li><a href="#slots">Slots</a></li>
 
-      <li><a href="#value">Value</a></li>
+      <li><a href="#validity">Validity</a></li>
+
+      <li><a href="#accessors">Accessors</a></li>
+
+      <li><a href="#constructor">Constructor</a></li>
 
       <li><a href="#see-also">See also</a></li>
       
@@ -193,7 +242,9 @@
     </ul>
 
     <h2>Author</h2>
-     Laurence Kell &amp; Philippe Grosjean 
+    
+Laurence Kell &amp; Philippe Grosjean
+
   </div>
 </div>
 
@@ -203,11 +254,14 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
    </div>
 
+  
+
   </body>
 </html>
+

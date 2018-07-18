@@ -403,7 +403,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       res2@var.nshk[,as.character(y.range[2])]<-1/max.age[,"w"]
       res2@var.nshk[ as.character(a.range[2])]<-1/max.yr[,"w"]
     }
-
+    
     res2@diagnostics<- df
     res2@index.hat  <- res@index.hat
     res2@stock.n    <- FLQuant(res@stock.n@.Data)

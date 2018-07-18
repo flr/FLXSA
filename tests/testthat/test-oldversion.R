@@ -9,8 +9,8 @@
 
 context("Comparison 32-64 bit FLXSA")
 
-data(ple4)
-data(ple4.indices)
+load("ple4.RData")
+load("ple4.indices.RData")
 
 # NEW run
 nre <- FLXSA(ple4, ple4.indices)
