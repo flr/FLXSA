@@ -1,7 +1,7 @@
 #ifndef _INC_flalloc
 #define _INC_flalloc
                     
-#include <malloc.h>  
+#include <stdlib.h>  
 #include "fl__types.h"
 
 #define MALLOC   malloc
