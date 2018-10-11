@@ -1,6 +1,4 @@
-#include <math.h>
 #include "fl__r.h" 
-//#include <float.h>
 
 SEXP ReturnError(char *ErrStr) 
     {

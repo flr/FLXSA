@@ -1,3 +1,4 @@
+#include <math.h>
 #include "fl__ctc.h"
 
 CatchData::CatchData(void)
