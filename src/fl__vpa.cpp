@@ -1,6 +1,6 @@
-#include "fl__vpa.h"
 #include <math.h>
 #include <algorithm>
+#include "fl__vpa.h"
 
 VirtualPopAnalysis::VirtualPopAnalysis(void)     
    {
@@ -59,10 +59,10 @@ void VirtualPopAnalysis::SetRange(LPSHORT Age,LPSHORT Year,short n)
    
    for (short i = 1; i < n; i++)
       {
-      MinAge   = (short)std::min(MinAge,  Age[i]);
-      MaxAge   = (short)std::max(MaxAge,  Age[i]);
-      MinYear  = (short)std::min(MinYear, Year[i]);
-      MaxYear  = (short)std::max(MaxYear, Year[i]);
+      MinAge   = (short)min(MinAge,  Age[i]);
+      MaxAge   = (short)max(MaxAge,  Age[i]);
+      MinYear  = (short)min(MinYear, Year[i]);
+      MaxYear  = (short)max(MaxYear, Year[i]);
       }
    }
 
@@ -76,27 +76,27 @@ void VirtualPopAnalysis::InitialiseMatrix(LP2DOUBLE Value)
 
 void VirtualPopAnalysis::CheckRangeWithCatch(short PlusGroup)
    {   
-   MinAge  = std::max(MinAge, pCatch->GetMinAge());
+   MinAge  = max(MinAge, pCatch->GetMinAge());
    if (PlusGroup > MinAge+2)
-      MaxAge  = std::min(pCatch->GetMaxAge(),(short)(PlusGroup-1));
-   MinYear = std::max(MinYear, pCatch->GetMinYear());
-   MaxYear = std::min(MaxYear, pCatch->GetMaxYear());
+      MaxAge  = min(pCatch->GetMaxAge(),(short)(PlusGroup-1));
+   MinYear = max(MinYear, pCatch->GetMinYear());
+   MaxYear = min(MaxYear, pCatch->GetMaxYear());
    }
  
 void VirtualPopAnalysis::SetM(short iAge, double Value)  
    {                                                 
    for (short iYear = MinYear; iYear <= MaxYear; iYear++)
-      M[std::min(MaxAge,std::max(MinAge,iAge))][iYear] = Value;
+      M[min(MaxAge,max(MinAge,iAge))][iYear] = Value;
    }
 
 void VirtualPopAnalysis::SetM(short iAge, short iYear, double Value)  
    {                                                 
-   M[std::min(MaxAge,std::max(MinAge,iAge))][std::min(MaxYear,std::max(MinYear,iYear))] = Value;
+   M[min(MaxAge,max(MinAge,iAge))][min(MaxYear,max(MinYear,iYear))] = Value;
    }
 
 void VirtualPopAnalysis::SetF(short iAge, short iYear, double Value)  
    {                                                 
-   F[std::min(MaxAge,std::max(MinAge,iAge))][std::min(MaxYear,std::max(MinYear,iYear))] = Value;
+   F[min(MaxAge,max(MinAge,iAge))][min(MaxYear,max(MinYear,iYear))] = Value;
    }
 
 void VirtualPopAnalysis::SetTerminalNs(void)  
@@ -146,22 +146,22 @@ double VirtualPopAnalysis::GetN(short iAge, short iYear)
    if (iAge < MinAge || iAge > MaxAge+1 || iYear < MinYear ||  iYear > MaxYear)
       return 0.0;
       
-   return std::max(0.0,N[iAge][iYear]);
+   return max(0.0,N[iAge][iYear]);
    }
    
 double VirtualPopAnalysis::GetF(short iAge, short iYear)
    {
-   return std::max(0.0,F[std::min(std::max(iAge,MinAge),MaxAge)][std::min(std::max(iYear,MinYear),MaxYear)]);
+   return max(0.0,F[min(max(iAge,MinAge),MaxAge)][min(max(iYear,MinYear),MaxYear)]);
    }
 
 double VirtualPopAnalysis::GetM(short iAge)
    {
-   return std::max(0.0,M[std::min(std::max(iAge,MinAge),MaxAge)][MinYear]);
+   return max(0.0,M[min(max(iAge,MinAge),MaxAge)][MinYear]);
    }
    
 double VirtualPopAnalysis::GetM(short iAge, short iYear)
    {
-   return std::max(0.0,M[std::min(std::max(iAge,MinAge),MaxAge)][std::min(std::max(iYear,MinYear),MaxYear)]);
+   return max(0.0,M[min(max(iAge,MinAge),MaxAge)][min(max(iYear,MinYear),MaxYear)]);
    }
 
 bool  VirtualPopAnalysis::RunCohortAnalysis(void)
@@ -169,12 +169,12 @@ bool  VirtualPopAnalysis::RunCohortAnalysis(void)
    short iAge, iYearClass;
 
    for (iYearClass = MaxYear - MinAge; iYearClass >= MinYear - MaxAge; iYearClass--)
-      for (iAge  = std::min(MaxAge, (short)(MaxYear - iYearClass)); iAge >= std::max(MinAge, (short)(MinYear - iYearClass)); iAge--)
+      for (iAge  = min(MaxAge, (short)(MaxYear - iYearClass)); iAge >= max(MinAge, (short)(MinYear - iYearClass)); iAge--)
          if (FRatioFlag && iAge == MaxAge && iYearClass < MaxYear - MaxAge)
             {                                   
-            F[iAge][iYearClass+iAge] = std::max(0.0,FRatio*F[iAge-1][iYearClass+iAge]);
+            F[iAge][iYearClass+iAge] = max(0.0,FRatio*F[iAge-1][iYearClass+iAge]);
               
-            N[iAge][iYearClass+iAge] = std::max(0.0,pCatch->GetCatch(iAge,iYearClass+iAge)
+            N[iAge][iYearClass+iAge] = max(0.0,pCatch->GetCatch(iAge,iYearClass+iAge)
                                    /(F[iAge][iYearClass+iAge]/(F[iAge][iYearClass+iAge] + GetM(iAge, iYearClass+iAge))
                                    *(1.0 - exp(-F[iAge][iYearClass+iAge] - GetM(iAge, iYearClass+iAge)))));   
         
@@ -183,10 +183,10 @@ bool  VirtualPopAnalysis::RunCohortAnalysis(void)
             {
             double t;
             t = N[iAge+1][iYearClass+iAge+1]*exp(GetM(iAge, iYearClass+iAge));
-            N[iAge][iYearClass+iAge] = std::max(0.0, t + pCatch->GetCatch(iAge, iYearClass+iAge) * exp(0.5*GetM(iAge, iYearClass+iAge))); 
+            N[iAge][iYearClass+iAge] = max(0.0, t + pCatch->GetCatch(iAge, iYearClass+iAge) * exp(0.5*GetM(iAge, iYearClass+iAge))); 
             
             if (N[iAge+1][iYearClass+iAge+1] > 0.0)
-               F[iAge][iYearClass+iAge] = std::max(0.0,log(N[iAge][iYearClass+iAge]/N[iAge+1][iYearClass+iAge+1]) - GetM(iAge, iYearClass+iAge));
+               F[iAge][iYearClass+iAge] = max(0.0,log(N[iAge][iYearClass+iAge]/N[iAge+1][iYearClass+iAge+1]) - GetM(iAge, iYearClass+iAge));
             else
                F[iAge][iYearClass+iAge] = 0.0;
 		      } 
@@ -203,21 +203,21 @@ bool VirtualPopAnalysis::RunVPA(void)
    double f, dfdx;         
 
    for (iYearClass = MaxYear - MinAge; iYearClass >= MinYear - MaxAge; iYearClass--)
-      for (iAge = std::min(MaxAge, (short)(MaxYear - iYearClass)); iAge >= std::max(MinAge, (short)(MinYear - iYearClass)); iAge--)
+      for (iAge = min(MaxAge, (short)(MaxYear - iYearClass)); iAge >= max(MinAge, (short)(MinYear - iYearClass)); iAge--)
          if (FRatioFlag && iAge == MaxAge && iYearClass < MaxYear - MaxAge)
             {                                   
-            F[iAge][iYearClass+iAge] = std::max(0.0,FRatio*F[iAge-1][iYearClass+iAge]);
-//            N[iAge][iYearClass+iAge] = std::max(0.0,pCatch->GetCatch(iAge,iYearClass+iAge)
+            F[iAge][iYearClass+iAge] = max(0.0,FRatio*F[iAge-1][iYearClass+iAge]);
+//            N[iAge][iYearClass+iAge] = max(0.0,pCatch->GetCatch(iAge,iYearClass+iAge)
 //                                       /(F[iAge][iYearClass+iAge]/(F[iAge][iYearClass+iAge] + GetM(iAge, iYearClass+iAge))
 //                                       *(1.0 - exp(-F[iAge][iYearClass+iAge] - GetM(iAge, iYearClass+iAge)))));   
-            N[iAge][iYearClass+iAge] = std::max(0.0,  pCatch->GetCatch(iAge,iYearClass+iAge)*(F[iAge][iYearClass+iAge] + GetM(iAge, iYearClass+iAge))
+            N[iAge][iYearClass+iAge] = max(0.0,  pCatch->GetCatch(iAge,iYearClass+iAge)*(F[iAge][iYearClass+iAge] + GetM(iAge, iYearClass+iAge))
                                                /(F[iAge][iYearClass+iAge]*(1.0 - exp(-F[iAge][iYearClass+iAge] - GetM(iAge, iYearClass+iAge)))));   
             }
          else
             {
             if (pCatch->GetCatch(iAge, iYearClass+iAge) <= 0.0)
                {
-               N[iAge][iYearClass+iAge] = std::max(0.0,N[iAge+1][iYearClass+iAge+1]*exp(GetM(iAge, iYearClass+iAge)));
+               N[iAge][iYearClass+iAge] = max(0.0,N[iAge+1][iYearClass+iAge+1]*exp(GetM(iAge, iYearClass+iAge)));
                F[iAge][iYearClass+iAge] = 0.0;
                }
             else
@@ -227,7 +227,7 @@ bool VirtualPopAnalysis::RunVPA(void)
                double t;
                
                t = N[iAge+1][iYearClass+iAge+1]*exp(GetM(iAge, iYearClass+iAge));
-               N[iAge][iYearClass+iAge] = std::max(0.0, t + pCatch->GetCatch(iAge, iYearClass+iAge) * exp(0.5*GetM(iAge, iYearClass+iAge)));
+               N[iAge][iYearClass+iAge] = max(0.0, t + pCatch->GetCatch(iAge, iYearClass+iAge) * exp(0.5*GetM(iAge, iYearClass+iAge)));
                
                do
                   {
@@ -244,7 +244,7 @@ bool VirtualPopAnalysis::RunVPA(void)
                while (fabs(f) >= VPA_TOL && Iters <= VPA_ITS);    
                
                //calc F at iAge
-               F[iAge][iYearClass+iAge] =  std::max(0.0,-log(N[iAge+1][iYearClass+iAge+1]/N[iAge][iYearClass+iAge]) - GetM(iAge, iYearClass+iAge));
+               F[iAge][iYearClass+iAge] =  max(0.0,-log(N[iAge+1][iYearClass+iAge+1]/N[iAge][iYearClass+iAge]) - GetM(iAge, iYearClass+iAge));
                }
             }
             
@@ -418,7 +418,7 @@ Function EricVPA(Catch As Object, M As Object, EricYear As Integer, FinalF As Do
    
    VBSepVPA EricCatch, FinalF, OldestSel, RefAge, RefSel, EricM, EricN, EricF, CatchHat
 
-   ReDim TermYear(MinAge + 1 To Application.std::min(MaxAge, LastTrueAge) + 1) As Double
+   ReDim TermYear(MinAge + 1 To Application.min(MaxAge, LastTrueAge) + 1) As Double
    ReDim TermAgeFRatio(1 To 1) As Double
    For iAge = MinAge + 1 To LastTrueAge
       TermYear(iAge) = EricN(iAge, EricYear)
@@ -565,7 +565,7 @@ Sub RunVPA(N As Double, F As Double, Nt1 As Double, Catch As Double, M As Double
    While fabs(g) >= 0.0000000001 And Iters <= 25
                
    'calc F at iAge
-   F = Application.std::max(0#, -Log(Nt1 / N) - M)
+   F = Application.max(0#, -Log(Nt1 / N) - M)
  
 
 End Sub
@@ -643,7 +643,7 @@ Function ForwardVPABevHolt(Catch As Object, M As Object, SWt As Object, Mat As O
             NMatrix(iAge + 1, iYear + 1) = NMatrix(iAge + 1, iYear + 1) - DeltaF
             i = i + 1
         Loop While i < 100 And Abs(DeltaF) > 0.0000000001
-        NMatrix(iAge + 1, iYear + 1) = Application.std::max(0#, NMatrix(iAge + 1, iYear + 1))
+        NMatrix(iAge + 1, iYear + 1) = Application.max(0#, NMatrix(iAge + 1, iYear + 1))
         FMatrix(iAge, iYear) = -Log(NMatrix(iAge + 1, iYear + 1) / NMatrix(iAge, iYear)) - MMatrix(iAge, iYear)
       
         SSB = SSB + NMatrix(MaxAge, iYear + MinAge) * SWtMatrix(MaxAge, iYear) * MatMatrix(MaxAge, iYear)

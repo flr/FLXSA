@@ -1,5 +1,3 @@
-#include <math.h>
-#include <float.h>
 #include "flrxsa.h"
 
 extern "C" SEXP runFLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags) 
