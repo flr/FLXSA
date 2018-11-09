@@ -17,4 +17,4 @@ Depends:
 Suggests:
     testthat
 Additional_repositories: http://flr-project.org/R
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

@@ -4,13 +4,12 @@
 \name{FLXSA.control}
 \alias{FLXSA.control}
 \alias{FLXSA.control-class}
-\alias{FLXSA.control}
 \title{A class for FLXSA control options}
 \usage{
 FLXSA.control(x = NULL, tol = 1e-09, maxit = 30, min.nse = 0.3,
   fse = 0.5, rage = 0, qage = 10, shk.n = TRUE, shk.f = TRUE,
-  shk.yrs = 5, shk.ages = 5, window = 100, tsrange = 20, tspower = 3,
-  vpa = FALSE)
+  shk.yrs = 5, shk.ages = 5, window = 100, tsrange = 20,
+  tspower = 3, vpa = FALSE)
 }
 \description{
 Runs of the FLXSA method require a number of parameter to be set. Most of them
