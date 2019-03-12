@@ -1,19 +1,22 @@
-# .travis.yml for R projects.
+language: r
+
+env:
+  - R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+
 warnings_are_errors: false
 
 os:
   - linux
-
-language: r
+  - osx
 
 r:
   - release
 
+branches:
+  only:
+  - master
+    
 sudo: false
-
-repos:
-  CRAN: https://cloud.r-project.org
-  flr: http://flr-project.org/R
 
 cache: packages
 
@@ -22,6 +25,25 @@ notifications:
     on_success: change
     on_failure: change
 
-branches:
-  only:
-    - master
+after_success:
+  # Get PKGVER
+  - 'export PKGVER=$(sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)'
+  - 'export REL=$(echo $PKGVER | grep -o "\." | grep -c "\.")'
+  - "echo $PKGVER $REL"
+  # Build binary and remove the source archive
+  - "R CMD INSTALL --build FLXSA_$PKGVER.tar.gz"
+  - "rm FLXSA_$PKGVER.tar.gz"
+  # Look for packages
+  - "export RELEASE_PKG_FILE=$(ls FLXSA*gz)"
+  - "echo $RELEASE_PKG_FILE"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: bJOsB3ZhJ8vD2BCDqKMC0Vf+FUuc5ul3J9mGOkwhVojKPuebEhotf1hfzkVM9Xn9vKLFqJKNt4a+zu9ZYVEgT4kC/9AqOZICBZ8hsHBR0V/frb+KQQvioBo7zryOjvSnyVtjs1gBuFdG0sbu+gflTlNHf+aawwMUdx5wZvYnqtc=
+  file: $RELEASE_PKG_FILE
+  skip_cleanup: true
+  draft: true
+  on:
+    repo: flr/FLXSA
+    condition: $REL = "2"
