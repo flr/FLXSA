@@ -3,8 +3,8 @@ Title: eXtended Survivor Analysis for FLR
 Authors@R: c(
   person("Iago", "Mosqueira", email = "iago.mosqueira@ec.europa.eu", role = "cre"),
   person("Laurence T.", "Kell", email = "laurie.kell@iccat.int", role = "aut"))
-Version: 2.6.3
-Date: 2018-10-11
+Version: 2.6.4
+Date: 2020-02-11
 Description:
   Calculates stock numbers and fishing mortality at age from commercial
   catch data and one or more indices of abundance suing the method in
