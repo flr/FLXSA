@@ -660,10 +660,11 @@ setMethod("diagnostics", signature(object="FLXSA"),
         if (control@rage < dims(object@index[[f]])$max){
           mlqbtitle[[f]] <- paste("\n\n Mean log catchability and standard error of ages with catchability \n",
               "independent of year class strength and constant w.r.t. time \n\n")
+    q.tab <- rbind(
+      Mean_Logq=round(c(log(object@q.hat[[f]])),4),
+      S.E_Logq=round(c(apply(object@index.res[[f]],1,sd,na.rm=TRUE)), 4))
 
-          q.tab <- rbind(Mean_Logq=round(c(log(object@q.hat[[f]])),4), S.E_Logq=round(c(sd(matrix(object@index.res[[f]],
-              dim(object@index.res[[f]])[2],dim(object@index.res[[f]])[1],byrow=T),na.rm=T)),4))
-          colnames(q.tab) <- dimnames(object@q.hat[[f]])$age
+    colnames(q.tab) <- dimnames(object@q.hat[[f]])$age
 
           if (dims(object@index[[f]])$min <= control@rage ) {
               mlqb[[f]] <- q.tab[,as.character((control@rage+1):max(as.numeric(dimnames(object@index[[f]])$age)))]
