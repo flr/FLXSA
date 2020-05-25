@@ -275,7 +275,6 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       return("Multiple iters only allowed if diag.flag=FALSE")
 
     if(!diag.flag) {
-      
       res<-.Call("runFLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
       
       iters <- max(iters.stock,iters.indices)
