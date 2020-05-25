@@ -2,7 +2,7 @@
 # FLXSA
 - Version: 2.6.4
 - Date: 2020-02-11
-- Author: Laurence T. Kell <laurie.kell ΑΤ iccat.int>
+- Author: Laurence T. Kell <laurie AT kell.es>
 - Maintainer: FLR Team <flrteam AT flr-project.org>
 - Repository: <https://github.com/flr/FLXSA/>
 - Bug reports: <https://github.com/flr/FLXSA/issues>
@@ -13,8 +13,6 @@ FLXSA provides the framework to perform eXtended Survivor Analysis in FLR.
 To install this package, start R and enter:
 
 	install.packages("FLXSA", repos="http://flr-project.org/R")
-
-or download from the [FLXSA releases page](https://github.com/flr/FLXSA/releases/latest)
 
 ## Documentation
 - [Help pages](http://flr-project.org/FLXSA)
