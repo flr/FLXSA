@@ -8,6 +8,18 @@
 
 # xsa.sa {{{
 
+#' An FLXSA estimator module for the mse package
+#'
+#' The `mse` package can use different stock assessment methods as modules in
+#' the estimation step of a management procedure. This functions provides such
+#' a module for FLXSA.
+#' As a flag for convergence, the returned tracking FLQuant contains the number
+#' of maximum number of iterations (maxit).
+#' @param stk An FLStock.
+#' @param idx An FLIndices.
+#'
+#' @return A list containing the updated FLStock, and the tracking FLQuant.
+
 xsa.sa <- function(stk, idx, ...){
 	args <- list(...)
 	args$stock <- stk
@@ -17,6 +29,6 @@ xsa.sa <- function(stk, idx, ...){
 	args$tracking <- NULL
 	fit <- do.call('FLXSA', args)
 	stk <- stk + fit
-	tracking["convergence",ac(range(stk)["maxyear"]+1)] <- fit@control@maxit
+	tracking["convergence", ac(range(stk)["maxyear"] + 1)] <- fit@control@maxit
 	list(stk = stk, tracking = tracking)
 } # }}}
