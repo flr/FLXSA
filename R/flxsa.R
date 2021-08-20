@@ -283,7 +283,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
           
         res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
         res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
-        for (i in as.character(2:iters)) {
+        for (i in (2:iters)) {
           res. <- .Call("runFLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
           iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
           iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
