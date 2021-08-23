@@ -272,7 +272,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       diag.flag <- FALSE
 
     if ((iters.stock>1 && iters.indices>1) && diag.flag)
-      return("Multiple iters only allowed if diag.flag=FALSE")
+      stop("Multiple iters only allowed if diag.flag=FALSE")
 
     if(!diag.flag) {
       res<-.Call("runFLXSA", iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
@@ -283,12 +283,16 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
           
         res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
         res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
-        for (i in as.character(2:iters)) {
-          res. <- .Call("runFLXSA", iter(stock,i), lapply(indices, iter,i), control, FALSE)
+        for (i in seq(2, iters)) {
+          res. <- .Call("runFLXSA", iter(stock, i), lapply(indices, iter, i),
+            control, FALSE)
           iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
           iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
         }
-      }       
+      }
+
+      dimnames(res@harvest)$iter <- dimnames(harvest(stock))$iter
+      dimnames(res@stock.n)$iter <- dimnames(stock.n(stock))$iter
 
       res@harvest@units <- "f"
       res@range   <- stock@range

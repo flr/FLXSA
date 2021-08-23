@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>is.FLXSA — is.FLXSA • FLXSA</title>
+<title>An FLXSA estimator module for the mse package — xsa.sa • FLXSA</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,12 @@
 
 
 
-<meta property="og:title" content="is.FLXSA — is.FLXSA" />
-<meta property="og:description" content="These two functions return code if objects are of class FLXSA and
-FLXSA.control, respectively." />
+<meta property="og:title" content="An FLXSA estimator module for the mse package — xsa.sa" />
+<meta property="og:description" content="The `mse` package can use different stock assessment methods as modules in
+the estimation step of a management procedure. This functions provides such
+a module for FLXSA.
+As a flag for convergence, the returned tracking FLQuant contains the number
+of maximum number of iterations (maxit)." />
 
 
 
@@ -113,41 +116,38 @@ FLXSA.control, respectively." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>is.FLXSA</h1>
+    <h1>An FLXSA estimator module for the mse package</h1>
     
-    <div class="hidden name"><code>is.FLXSA.Rd</code></div>
+    <div class="hidden name"><code>xsa.sa.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>These two functions return <code>code</code> if objects are of class FLXSA and
-FLXSA.control, respectively.</p>
+    <p>The `mse` package can use different stock assessment methods as modules in
+the estimation step of a management procedure. This functions provides such
+a module for FLXSA.
+As a flag for convergence, the returned tracking FLQuant contains the number
+of maximum number of iterations (maxit).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>is.FLXSA</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>xsa.sa</span><span class='op'>(</span><span class='va'>stk</span>, <span class='va'>idx</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>An object to be tested</p></td>
+      <th>stk</th>
+      <td><p>An FLStock.</p></td>
+    </tr>
+    <tr>
+      <th>idx</th>
+      <td><p>An FLIndices.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>is.FLXSA returns <code>TRUE</code> if its argument is of class
-<code>FLXSA</code> (that is, has "FLXSA" amongst its classes) and FALSE otherwise.
-is.FLXSA.control returns <code>TRUE</code> if its argument is of class
-<code>FLXSA.control</code> (that is, has "FLXSA.control" amongst its classes) and
-FALSE otherwise.</p>
+    <p>A list containing the updated FLStock, and the tracking FLQuant.</p>
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='va'>xsa</span> <span class='op'>&lt;-</span> <span class='fu'><a href='FLXSA.control.html'>FLXSA.control</a></span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>is.FLXSA.control</span><span class='op'>(</span><span class='va'>xsa</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

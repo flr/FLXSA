@@ -77,7 +77,7 @@ Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id"
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">FLXSA</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.6.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">2.6.5</span>
       </span>
     </div>
 
@@ -131,17 +131,30 @@ libero. Pellentesque molestie mi sed orci feugiat, non mollis enim tristique.
 Suspendisse eu sapien vitae arcu lobortis ultrices vitae ac velit. Curabitur id</p>
     </div>
 
-    <pre class="usage"><span class='fu'>FLXSA.control</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-09</span>, <span class='kw'>maxit</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>min.nse</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
-  <span class='kw'>fse</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>rage</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>qage</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>shk.n</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>shk.f</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>shk.yrs</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>shk.ages</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>window</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>tsrange</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>tspower</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>vpa</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>FLXSA.control</span><span class='op'>(</span>
+  x <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tol <span class='op'>=</span> <span class='fl'>1e-09</span>,
+  maxit <span class='op'>=</span> <span class='fl'>30</span>,
+  min.nse <span class='op'>=</span> <span class='fl'>0.3</span>,
+  fse <span class='op'>=</span> <span class='fl'>0.5</span>,
+  rage <span class='op'>=</span> <span class='fl'>0</span>,
+  qage <span class='op'>=</span> <span class='fl'>10</span>,
+  shk.n <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  shk.f <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  shk.yrs <span class='op'>=</span> <span class='fl'>5</span>,
+  shk.ages <span class='op'>=</span> <span class='fl'>5</span>,
+  window <span class='op'>=</span> <span class='fl'>100</span>,
+  tsrange <span class='op'>=</span> <span class='fl'>20</span>,
+  tspower <span class='op'>=</span> <span class='fl'>3</span>,
+  vpa <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
 
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
 
-<dl'>
+<dl>
 <dt><code>x</code></dt><dd><p>An object of class FLXSA. If provided, the 'FLXSA.control' is
 initialized with the corresponding values of an XSA analysis stored in the
 object. This is useful for getting the same initial sloteters for
@@ -188,7 +201,7 @@ terminal age</p></dd>
     
 
 
-<p></p><dl'>
+<p></p><dl>
     <dt>VALIDITY</dt><dd><p>Neque porro quisquam est qui dolorem ipsum.</p></dd>
 
 </dl>
@@ -215,12 +228,16 @@ class validity.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p>FLComp</p></div>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Laurence Kell &amp; Philippe Grosjean</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-        <span class='co'># To create a new FLXSA.control object with default parameters:</span>
-        <span class='no'>my.xsa.control</span> <span class='kw'>&lt;-</span> <span class='fu'>FLXSA.control</span>()
-        <span class='no'>my.xsa.control</span></div><div class='output co'>#&gt; tol 		 1e-09 
+  <span class='co'># To create a new FLXSA.control object with default parameters:</span>
+  <span class='va'>my.xsa.control</span> <span class='op'>&lt;-</span> <span class='fu'>FLXSA.control</span><span class='op'>(</span><span class='op'>)</span>
+  <span class='va'>my.xsa.control</span>
+</div><div class='output co'>#&gt; tol 		 1e-09 
 #&gt; maxit 		 30 
 #&gt; min.nse 		 0.3 
 #&gt; fse 		 0.5 
@@ -233,9 +250,10 @@ class validity.</p>
 #&gt; window 		 100 
 #&gt; tsrange 		 20 
 #&gt; tspower 		 3 
-#&gt; vpa 		 FALSE </div><div class='input'>        <span class='co'># Same, but changing values of some parameters</span>
-        <span class='no'>my.xsa.control</span> <span class='kw'>&lt;-</span> <span class='fu'>FLXSA.control</span>(<span class='kw'>maxit</span><span class='kw'>=</span><span class='fl'>50</span>, <span class='kw'>shk.f</span><span class='kw'>=</span><span class='fl'>FALSE</span>)
-        <span class='no'>my.xsa.control</span></div><div class='output co'>#&gt; tol 		 1e-09 
+#&gt; vpa 		 FALSE </div><div class='input'>  <span class='co'># Same, but changing values of some parameters</span>
+  <span class='va'>my.xsa.control</span> <span class='op'>&lt;-</span> <span class='fu'>FLXSA.control</span><span class='op'>(</span>maxit<span class='op'>=</span><span class='fl'>50</span>, shk.f<span class='op'>=</span><span class='cn'>FALSE</span><span class='op'>)</span>
+  <span class='va'>my.xsa.control</span>
+</div><div class='output co'>#&gt; tol 		 1e-09 
 #&gt; maxit 		 50 
 #&gt; min.nse 		 0.3 
 #&gt; fse 		 0.5 
@@ -265,7 +283,7 @@ class validity.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

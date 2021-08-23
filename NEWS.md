@@ -1,3 +1,9 @@
+# FLXSA 2.6.6
+
+## BUG FIXES
+
+- loop over iters can now handle non-sequential iter dimnames.
+
 # FLXSA 2.6.1
 
 ## BUG FIXES

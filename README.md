@@ -1,7 +1,7 @@
 
 # FLXSA
-- Version: 2.6.4
-- Date: 2020-02-11
+- Version: 2.6.5.9001
+- Date: 08-07-2021
 - Author: Laurence T. Kell <laurie AT kell.es>
 - Maintainer: FLR Team <flrteam AT flr-project.org>
 - Repository: <https://github.com/flr/FLXSA/>
