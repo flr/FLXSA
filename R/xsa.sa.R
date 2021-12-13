@@ -20,15 +20,20 @@
 #'
 #' @return A list containing the updated FLStock, and the tracking FLQuant.
 
-xsa.sa <- function(stk, idx, ...){
-	args <- list(...)
-	args$stock <- stk
-	args$indices <- idx
-	if(is.null(args$control)) args$control <- FLXSA.control()
-	tracking <- args$tracking
-	args$tracking <- NULL
-	fit <- do.call('FLXSA', args)
+xsa.sa <- function(stk, idx, args, tracking, ...) {
+
+	args0 <- list(...)
+	
+  args0$stock <- stk
+	args0$indices <- idx
+	
+  if(is.null(args0$control)) args0$control <- FLXSA.control()
+	
+	fit <- do.call('FLXSA', args0)
+
 	stk <- stk + fit
-	tracking["convergence", ac(range(stk)["maxyear"] + 1)] <- fit@control@maxit
-	list(stk = stk, tracking = tracking)
+
+  track(tracking, "conv.est", ac(args$ay)) <- fit@control@maxit
+	
+  list(stk = stk, tracking = tracking)
 } # }}}
