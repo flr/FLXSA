@@ -1,7 +1,7 @@
 
 # FLXSA
 - Version: 2.6.5.9002
-- Date: 13-12-2021
+- Date: 03-05-2022
 - Author: Laurence T. Kell <laurie AT kell.es>
 - Maintainer: FLR Team <flrteam AT flr-project.org>
 - Repository: <https://github.com/flr/FLXSA/>
@@ -25,7 +25,7 @@ To install this package, start R and enter:
 - [All release](https://github.com/flr/FLXSA/releases/)
 
 ## License
-Copyright (c) 2004-2015 The FLR Team. Released under the [GPL v2](http://www.gnu.org/licenses/gpl-2.0.html).
+Copyright (c) 2004-2022 The FLR Team. Released under the [GPL v2](http://www.gnu.org/licenses/gpl-2.0.html).
 
 ## Contact
 You are welcome to:

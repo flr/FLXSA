@@ -4,7 +4,7 @@
 \alias{xsa.sa}
 \title{An FLXSA estimator module for the mse package}
 \usage{
-xsa.sa(stk, idx, ...)
+xsa.sa(stk, idx, args, tracking, ...)
 }
 \arguments{
 \item{stk}{An FLStock.}
