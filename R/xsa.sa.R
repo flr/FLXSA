@@ -19,6 +19,10 @@
 #' @param idx An FLIndices.
 #'
 #' @return A list containing the updated FLStock, and the tracking FLQuant.
+#' @examples
+#' data(ple4)
+#' data(ple4.index)
+#' xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018), tracking=FLQuant())
 
 xsa.sa <- function(stk, idx, args, tracking, ...) {
 

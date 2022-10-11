@@ -21,3 +21,8 @@ a module for FLXSA.
 As a flag for convergence, the returned tracking FLQuant contains the number
 of maximum number of iterations (maxit).
 }
+\examples{
+data(ple4)
+data(ple4.index)
+xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018), tracking=FLQuant())
+}

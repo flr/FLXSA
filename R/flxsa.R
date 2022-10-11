@@ -159,7 +159,8 @@ setGeneric("FLXSA", function(stock, indices, ...)
 
 setMethod("FLXSA", signature(stock="FLStock", indices="FLIndex"),
   function(stock, indices, control=FLXSA.control(), diag.flag=TRUE) {
-    FLXSA(stock=stock, indices=FLIndices(indices), control=control, diag.flag=diag.flag)
+    FLXSA(stock=stock, indices=FLIndices(indices), control=control,
+      diag.flag=diag.flag)
   }
 )
 
@@ -291,7 +292,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
         }
       }
 
-      dimnames(res@harvest)$iter <- dimnames(harvest(stock))$iter
+      dimnames(res@harvest)$iter <- dimnames(stock.n(stock))$iter
       dimnames(res@stock.n)$iter <- dimnames(stock.n(stock))$iter
 
       res@harvest@units <- "f"
