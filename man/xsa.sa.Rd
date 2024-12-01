@@ -10,6 +10,10 @@ xsa.sa(stk, idx, args, tracking, ...)
 \item{stk}{An FLStock.}
 
 \item{idx}{An FLIndices.}
+
+\item{args}{Arguments for call to mp(), list.}
+
+\item{tracking}{Tracking FLQuant.}
 }
 \value{
 A list containing the updated FLStock, and the tracking FLQuant.
@@ -24,5 +28,6 @@ of maximum number of iterations (maxit).
 \examples{
 data(ple4)
 data(ple4.index)
-xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018), tracking=FLQuant())
+xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018),
+ tracking=FLQuant(dimnames=list(quant='conv.est', year=2018)))
 }

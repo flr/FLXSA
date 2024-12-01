@@ -17,12 +17,15 @@
 #' of maximum number of iterations (maxit).
 #' @param stk An FLStock.
 #' @param idx An FLIndices.
+#' @param args Arguments for call to mp(), list.
+#' @param tracking Tracking FLQuant.
 #'
 #' @return A list containing the updated FLStock, and the tracking FLQuant.
 #' @examples
 #' data(ple4)
 #' data(ple4.index)
-#' xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018), tracking=FLQuant())
+#' xsa.sa(stk=ple4, idx=ple4.index, args=list(ay=2018),
+#'  tracking=FLQuant(dimnames=list(quant='conv.est', year=2018)))
 
 xsa.sa <- function(stk, idx, args, tracking, ...) {
 
@@ -31,13 +34,17 @@ xsa.sa <- function(stk, idx, args, tracking, ...) {
   args0$stock <- stk
 	args0$indices <- idx
 	
+  # SET default control if missing
   if(is.null(args0$control)) args0$control <- FLXSA.control()
 	
+  # CALL to fit
 	fit <- do.call('FLXSA', args0)
 
+  # UPDATE stk
 	stk <- stk + fit
 
-  track(tracking, "conv.est", ac(args$ay)) <- fit@control@maxit
-	
+  # TRACK 'convergence'
+  tracking['conv.est', ac(args$ay)] <- fit@control@maxit
+
   list(stk = stk, tracking = tracking)
 } # }}}

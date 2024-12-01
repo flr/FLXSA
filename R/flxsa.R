@@ -166,7 +166,7 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndex"),
 
 setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
   function(stock, indices, control=FLXSA.control(), diag.flag=TRUE) {
-    
+
     Call <- match.call()
     # check FLIndices input
     for (i in 1:length(indices)) {
@@ -299,10 +299,12 @@ setMethod("FLXSA", signature(stock="FLStock", indices="FLIndices"),
       res@range   <- stock@range
       
       return(res)
-      }
+    }
 
-    res <-fqs(.Call("runFLXSA", stock, indices, control, diag.flag))
-      
+    res <- .Call("runFLXSA", stock, indices, control, diag.flag)
+
+    res <- fqs(res)
+
     if (class(res) != "FLXSA")
       return(res)
     res@call <- as.character(Call)

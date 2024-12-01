@@ -17,5 +17,5 @@ Depends:
 Suggests:
     testthat
 Additional_repositories: http://flr-project.org/R
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
 ByteCompile: TRUE
