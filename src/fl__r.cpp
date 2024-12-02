@@ -4,8 +4,8 @@ SEXP ReturnError(char *ErrStr)
     {
     SEXP Err;
     
-    PROTECT(Err = allocVector(STRSXP, 1));
-    SET_STRING_ELT(Err, 0, mkChar(ErrStr));
+    PROTECT(Err = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(Err, 0, Rf_mkChar(ErrStr));
     
     UNPROTECT(1);
 
@@ -18,11 +18,11 @@ bool InputRange(SEXP _range, int *pMinAge, int *pMaxAge, int *pPlusgroup, int *p
     double *x;
 
 
-    if (!isVector(_range) || !isNumeric(_range)) 
+    if (!Rf_isVector(_range) || !Rf_isNumeric(_range)) 
          return false;
 
     PROTECT(_range = AS_NUMERIC(_range));
-    n = LENGTH(_range);
+    n = Rf_length(_range);
 
     x = NUMERIC_POINTER(_range); 
     
@@ -47,13 +47,13 @@ bool InputRange(SEXP _range, int *pMinAge, int *pMaxAge, int *pPlusgroup, int *p
 
 bool InputFLQuant(SEXP FLQuant, double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYear)
     {
-    SEXP Quant    = PROTECT(duplicate(GET_SLOT(FLQuant, install(".Data")))),
+    SEXP Quant    = PROTECT(Rf_duplicate(GET_SLOT(FLQuant, Rf_install(".Data")))),
          dims     = GET_DIM(Quant),
          dimnames = GET_DIMNAMES(Quant);
 
     double *Q     = NUMERIC_POINTER(Quant);
 
-  	 int dim[6], n = length(dims);
+  	 int dim[6], n = Rf_length(dims);
     
     dim[0] = INTEGER(dims)[0];
     dim[1] = INTEGER(dims)[1];
@@ -116,13 +116,13 @@ bool InputFLQuant(SEXP FLQuant, double ***pD, int MinAge, int MaxAge, int MinYea
 
 bool InputFLQuant(SEXP FLQuant, double ***pD, short *pMin1, short *pMax1, short *pMin2, short *pMax2)
     {
-    SEXP v        = PROTECT(duplicate(GET_SLOT(FLQuant, install(".Data")))),
+    SEXP v        = PROTECT(Rf_duplicate(GET_SLOT(FLQuant, Rf_install(".Data")))),
          dims     = GET_DIM(v),
          dimnames = GET_DIMNAMES(v);
 
     double *a     = NUMERIC_POINTER(v);
 
-  	 short dim[2], n = length(dims);
+  	 short dim[2], n = Rf_length(dims);
 
     if (n < 2)
        {
@@ -186,7 +186,7 @@ SEXP CreateFLQuant(double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYea
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = MaxYear-MinYear+1;
     INTEGER(dim)[2] = 1; 
@@ -198,50 +198,50 @@ SEXP CreateFLQuant(double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYea
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxYear-MinYear+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxYear-MinYear+1));
     for (iYear=MinYear, i=0; iYear<=MaxYear; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
-    PROTECT(d3 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d3, 0, mkChar("unique"));
+    PROTECT(d3 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 2, d3);
     
-    PROTECT(d4 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d4, 0, mkChar("all"));
+    PROTECT(d4 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
     SET_VECTOR_ELT(dimnames, 3, d4);
     
-    PROTECT(d5 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d5, 0, mkChar("unique"));
+    PROTECT(d5 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 4, d5);
     
-    PROTECT(d6 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d6, 0, mkChar("1"));
+    PROTECT(d6 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d6, 0, Rf_mkChar("1"));
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
-    //setAttrib(v, R_ClassSymbol, mkChar("FLQuant"));
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
+    //Rf_setAttrib(v, R_ClassSymbol, Rf_mkChar("FLQuant"));
 
   //SEXP klass;
-  //PROTECT(klass = allocVector(STRSXP, 1));
-  //SET_STRING_ELT(klass, 0, mkChar("FLQuant"));
-  //setAttrib(v, R_ClassSymbol, klass);
+  //PROTECT(klass = Rf_allocVector(STRSXP, 1));
+  //SET_STRING_ELT(klass, 0, Rf_mkChar("FLQuant"));
+  //Rf_setAttrib(v, R_ClassSymbol, klass);
 
     
     //Set data
@@ -255,8 +255,8 @@ SEXP CreateFLQuant(double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYea
     	    }
            
     //Set slot
-    //FLQuant = SET_SLOT(FLQuant, install("v"), v);
-    FLQuant = R_do_slot_assign(FLQuant, install(".Data"), v);
+    //FLQuant = SET_SLOT(FLQuant, Rf_install("v"), v);
+    FLQuant = R_do_slot_assign(FLQuant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -277,7 +277,7 @@ SEXP CreateArray(double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYear)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = MaxYear-MinYear+1; 
         
@@ -285,24 +285,24 @@ SEXP CreateArray(double ***pD, int MinAge, int MaxAge, int MinYear, int MaxYear)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxYear-MinYear+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxYear-MinYear+1));
     for (iYear=MinYear, i=0; iYear<=MaxYear; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 2));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)

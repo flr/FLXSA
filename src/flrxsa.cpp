@@ -16,21 +16,21 @@ ExtendedSurvivorsAnalysisR::ExtendedSurvivorsAnalysisR(SEXP xControl, SEXP xM, C
    Error = !FiFiErrNull;
 
    //Controls
-   Control.MSSTol        =     max(   REAL(GET_SLOT(xControl,install("tol"           )))[0],0.0);
-   Control.MaxIters      = (short) INTEGER(GET_SLOT(xControl,install("maxit"         )))[0];
-   Control.MinNSE        =     max(   REAL(GET_SLOT(xControl,install("min.nse"       )))[0],0.0);
-   Control.FShkSE        =     max(   REAL(GET_SLOT(xControl,install("fse"           )))[0],0.0); 
-   Control.LRcrtAge      = (short) INTEGER(GET_SLOT(xControl,install("rage"          )))[0];
-   Control.ConQAge       = (short) INTEGER(GET_SLOT(xControl,install("qage"          )))[0];
-   Control.Shk2N         =         LOGICAL(GET_SLOT(xControl,install("shk.n"         )))[0];
-   Control.Shk2F         =         LOGICAL(GET_SLOT(xControl,install("shk.f"         )))[0];
-   Control.Shk2FYr       = (short) INTEGER(GET_SLOT(xControl,install("shk.yrs"       )))[0];
-   Control.Shk2FAge      = (short) INTEGER(GET_SLOT(xControl,install("shk.ages"      )))[0];
-   Control.TSRange       = (short) INTEGER(GET_SLOT(xControl,install("tsrange"       )))[0];
-   Control.TSPower       = (short) INTEGER(GET_SLOT(xControl,install("tspower"       )))[0];
+   Control.MSSTol        =     max(   REAL(GET_SLOT(xControl,Rf_install("tol"           )))[0],0.0);
+   Control.MaxIters      = (short) INTEGER(GET_SLOT(xControl,Rf_install("maxit"         )))[0];
+   Control.MinNSE        =     max(   REAL(GET_SLOT(xControl,Rf_install("min.nse"       )))[0],0.0);
+   Control.FShkSE        =     max(   REAL(GET_SLOT(xControl,Rf_install("fse"           )))[0],0.0); 
+   Control.LRcrtAge      = (short) INTEGER(GET_SLOT(xControl,Rf_install("rage"          )))[0];
+   Control.ConQAge       = (short) INTEGER(GET_SLOT(xControl,Rf_install("qage"          )))[0];
+   Control.Shk2N         =         LOGICAL(GET_SLOT(xControl,Rf_install("shk.n"         )))[0];
+   Control.Shk2F         =         LOGICAL(GET_SLOT(xControl,Rf_install("shk.f"         )))[0];
+   Control.Shk2FYr       = (short) INTEGER(GET_SLOT(xControl,Rf_install("shk.yrs"       )))[0];
+   Control.Shk2FAge      = (short) INTEGER(GET_SLOT(xControl,Rf_install("shk.ages"      )))[0];
+   Control.TSRange       = (short) INTEGER(GET_SLOT(xControl,Rf_install("tsrange"       )))[0];
+   Control.TSPower       = (short) INTEGER(GET_SLOT(xControl,Rf_install("tspower"       )))[0];
    Control.PlusGroup     = true;
-   Control.TuningWindow  = (short) INTEGER(GET_SLOT(xControl,install("window"        )))[0];
-   Control.VPA           =         LOGICAL(GET_SLOT(xControl,install("vpa"           )))[0];
+   Control.TuningWindow  = (short) INTEGER(GET_SLOT(xControl,Rf_install("window"        )))[0];
+   Control.VPA           =         LOGICAL(GET_SLOT(xControl,Rf_install("vpa"           )))[0];
    
    MinAge  = pCatch->GetMinAge();             
    
@@ -70,74 +70,74 @@ SEXP ExtendedSurvivorsAnalysisR::Return(int _MaxYear)
    if (MaxAge == Control.PlusGroup-1) _MaxAge = MaxAge+1; else _MaxAge = MaxAge;
 
    //N
-   SET_SLOT(ReturnObject, install("stock.n"),  CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear));
+   SET_SLOT(ReturnObject, Rf_install("stock.n"),  CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear));
 
    //Terminal N std errors
-   SET_SLOT(ReturnObject, install("se.int"), ReturnInternalSE());
-   SET_SLOT(ReturnObject, install("se.ext"), ReturnExternalSE());
+   SET_SLOT(ReturnObject, Rf_install("se.int"), ReturnInternalSE());
+   SET_SLOT(ReturnObject, Rf_install("se.ext"), ReturnExternalSE());
 
    //F
-   SET_SLOT(ReturnObject, install("harvest"),  CreateFLQuant(&F, MinAge, _MaxAge, MinYear, MaxYear));
+   SET_SLOT(ReturnObject, Rf_install("harvest"),  CreateFLQuant(&F, MinAge, _MaxAge, MinYear, MaxYear));
 
    //Control
-   SET_SLOT(ReturnObject, install("control"),  ReturnControl());
+   SET_SLOT(ReturnObject, Rf_install("control"),  ReturnControl());
 
    //index hat
    SEXP indexhat;
-   PROTECT(indexhat = allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(indexhat = Rf_allocVector(VECSXP,pTune->GetNFleet()));
    int i;
    for (i=1; i<=pTune->GetNFleet(); i++)
       SET_VECTOR_ELT(indexhat, i-1,  ReturnIndexHat(i));
 
-   SET_SLOT(ReturnObject, install("index.hat"), indexhat);
+   SET_SLOT(ReturnObject, Rf_install("index.hat"), indexhat);
 
    //index var
    SEXP indexvar;
-   PROTECT(indexvar = allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(indexvar = Rf_allocVector(VECSXP,pTune->GetNFleet()));
    for (i=1; i<=pTune->GetNFleet(); i++)
       SET_VECTOR_ELT(indexvar, i-1,  ReturnIndexVar(i));
 
-   SET_SLOT(ReturnObject, install("index.var"), indexvar);
+   SET_SLOT(ReturnObject, Rf_install("index.var"), indexvar);
 
    //q residuals
    SEXP qreslist;
-   PROTECT(qreslist = allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(qreslist = Rf_allocVector(VECSXP,pTune->GetNFleet()));
    for (i=1; i<=pTune->GetNFleet(); i++)
       SET_VECTOR_ELT(qreslist, i-1,  ReturnQRes(i));
 
-   SET_SLOT(ReturnObject, install("index.res"), qreslist);
+   SET_SLOT(ReturnObject, Rf_install("index.res"), qreslist);
    
    //q 
    SEXP qlist, q2list;
-   PROTECT(qlist  = allocVector(VECSXP,pTune->GetNFleet()));
-   PROTECT(q2list = allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(qlist  = Rf_allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(q2list = Rf_allocVector(VECSXP,pTune->GetNFleet()));
    for (i=1; i<=pTune->GetNFleet(); i++)
       {
       SET_VECTOR_ELT(qlist,  i-1,  ReturnQ(1, i));
       SET_VECTOR_ELT(q2list, i-1,  ReturnQ(2, i));
       }
 
-   SET_SLOT(ReturnObject, install("q.hat"),  qlist);
-   SET_SLOT(ReturnObject, install("q2.hat"), q2list);
+   SET_SLOT(ReturnObject, Rf_install("q.hat"),  qlist);
+   SET_SLOT(ReturnObject, Rf_install("q2.hat"), q2list);
    
    //corrected cpue
    SEXP cpuelist;
-   PROTECT(cpuelist = allocVector(VECSXP,pTune->GetNFleet()));
+   PROTECT(cpuelist = Rf_allocVector(VECSXP,pTune->GetNFleet()));
    for (i=1; i<=pTune->GetNFleet(); i++)
       SET_VECTOR_ELT(cpuelist, i-1,  ReturnCorrectedCPUE(i));
 
-   SET_SLOT(ReturnObject, install("index"), cpuelist);
+   SET_SLOT(ReturnObject, Rf_install("index"), cpuelist);
    
    double **t; int nr, nc;
    OutputTermPopWts(&t, &nr, &nc);
 
-   SET_SLOT(ReturnObject, install("wts"),  CreateArray(&t, 1, nr, 1, nc));
+   SET_SLOT(ReturnObject, Rf_install("wts"),  CreateArray(&t, 1, nr, 1, nc));
 
    free_flallocArray(t, 1, nr, 1, nc);
 
    //Survivors
    CalcTermPops();
-   SET_SLOT(ReturnObject, install("survivors"), CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear+1));
+   SET_SLOT(ReturnObject, Rf_install("survivors"), CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear+1));
 
    UNPROTECT(7);
 
@@ -159,26 +159,26 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnQ(short param, short iFleet)
 
     //Create array    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 1));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 1));       
     INTEGER(dim)[0] = MaxTuneAge[iFleet] -MinTuneAge[iFleet] +1;
         
     //Allocate memory
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 1));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 1));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
 
 
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 1));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
@@ -203,10 +203,10 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnSimple(int _MaxYear)
    if (MaxAge == Control.PlusGroup-1) _MaxAge = MaxAge+1; else _MaxAge = MaxAge;
 
    //N
-   SET_SLOT(ReturnObject, install("stock.n"),  CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear));
+   SET_SLOT(ReturnObject, Rf_install("stock.n"),  CreateFLQuant(&N, MinAge, _MaxAge, MinYear, MaxYear));
 
    //F
-   SET_SLOT(ReturnObject, install("harvest"),  CreateFLQuant(&F, MinAge, _MaxAge, MinYear, MaxYear));
+   SET_SLOT(ReturnObject, Rf_install("harvest"),  CreateFLQuant(&F, MinAge, _MaxAge, MinYear, MaxYear));
 
 
    UNPROTECT(1);
@@ -224,7 +224,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnIndexHat(short iFleet)
 
     //Create array    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = MaxTuneAge[iFleet] -MinTuneAge[iFleet] +1;
     INTEGER(dim)[1] = MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1;
         
@@ -232,24 +232,24 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnIndexHat(short iFleet)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
     for (iYear=MinTuneYear[iFleet], i=0; iYear<=MaxTuneYear[iFleet]; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 2));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
@@ -276,7 +276,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnIndexVar(short iFleet)
 
     //Create array    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = MaxTuneAge[iFleet] -MinTuneAge[iFleet] +1;
     INTEGER(dim)[1] = MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1;
         
@@ -284,24 +284,24 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnIndexVar(short iFleet)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
     for (iYear=MinTuneYear[iFleet], i=0; iYear<=MaxTuneYear[iFleet]; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 2));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
@@ -333,7 +333,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnQRes(short iFleet)
 
     //Create array    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = MaxTuneAge[iFleet] -MinTuneAge[iFleet] +1;
     INTEGER(dim)[1] = MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1;
         
@@ -341,24 +341,24 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnQRes(short iFleet)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
     for (iYear=MinTuneYear[iFleet], i=0; iYear<=MaxTuneYear[iFleet]; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 2));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
@@ -389,7 +389,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnCorrectedCPUE(short iFleet, short _MaxYea
 
     //Create array    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = MaxTuneAge[iFleet] -MinTuneAge[iFleet] +1;
     INTEGER(dim)[1] = MaxYear-MinTuneYear[iFleet]+1;
         
@@ -397,24 +397,24 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnCorrectedCPUE(short iFleet, short _MaxYea
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxTuneAge[iFleet]-MinTuneAge[iFleet] +1));
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, MaxTuneYear[iFleet]-MinTuneYear[iFleet]+1));
     for (iYear=MinTuneYear[iFleet], i=0; iYear<=MaxYear; iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 2));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
     
     //Set data
     for (iAge=MinTuneAge[iFleet], i=0; iAge<=MaxTuneAge[iFleet]; iAge++, i++)
@@ -445,7 +445,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = 1;
     INTEGER(dim)[2] = 1;
@@ -457,51 +457,51 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnInternalSE(void)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, 1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, 1));
     INTEGER(d2)[0] = MaxYear+1;
     SET_VECTOR_ELT(dimnames, 1, d2);
      
-    PROTECT(d3 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d3, 0, mkChar("unique"));
+    PROTECT(d3 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 2, d3);
     
-    PROTECT(d4 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d4, 0, mkChar("all"));
+    PROTECT(d4 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
     SET_VECTOR_ELT(dimnames, 3, d4);
 
-    PROTECT(d5 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d5, 0, mkChar("unique"));
+    PROTECT(d5 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d6, 0, mkChar("1"));
+    PROTECT(d6 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d6, 0, Rf_mkChar("1"));
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
 
     //Set data
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++) 
        REAL(v)[i] = InternalSE[0][MaxYear-iAge];
         
     //Set slot
-    //FLQuant = SET_SLOT(FLQuant, install("v"), v);
-    FLQuant = R_do_slot_assign(FLQuant, install(".Data"), v);
+    //FLQuant = SET_SLOT(FLQuant, Rf_install("v"), v);
+    FLQuant = R_do_slot_assign(FLQuant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -521,7 +521,7 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = MaxAge -MinAge +1;
     INTEGER(dim)[1] = 1;
     INTEGER(dim)[2] = 1;
@@ -533,51 +533,51 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnExternalSE(void)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, MaxAge-MinAge +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, MaxAge-MinAge +1));
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, 1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, 1));
     INTEGER(d2)[0] = MaxYear+1;
     SET_VECTOR_ELT(dimnames, 1, d2);
      
-    PROTECT(d3 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d3, 0, mkChar("unique"));
+    PROTECT(d3 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 2, d3);
     
-    PROTECT(d4 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d4, 0, mkChar("all"));
+    PROTECT(d4 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
     SET_VECTOR_ELT(dimnames, 3, d4);
 
-    PROTECT(d5 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d5, 0, mkChar("unique"));
+    PROTECT(d5 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
     SET_VECTOR_ELT(dimnames, 4, d5);
     
-    PROTECT(d6 = allocVector(STRSXP, 1));
-    SET_STRING_ELT(d6, 0, mkChar("1"));
+    PROTECT(d6 = Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(d6, 0, Rf_mkChar("1"));
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter"));
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter"));
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
 
     //Set data
     for (iAge=MinAge, i=0; iAge<=MaxAge; iAge++, i++) 
        REAL(v)[i] = ExternalSE[0][MaxYear-iAge];
         
     //Set slot
-    //FLQuant = SET_SLOT(FLQuant, install("v"), v);
-    FLQuant = R_do_slot_assign(FLQuant, install(".Data"), v);
+    //FLQuant = SET_SLOT(FLQuant, Rf_install("v"), v);
+    FLQuant = R_do_slot_assign(FLQuant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -637,20 +637,20 @@ SEXP ExtendedSurvivorsAnalysisR::ReturnControl(void)
    INTEGER(TuningWindow)[0] = Control.TuningWindow;
    INTEGER(VPA)[0]          = Control.VPA;
 
-   SET_SLOT(xControl,install("tol"          ), MSStol);
-   SET_SLOT(xControl,install("maxit"        ), MaxIters);   
-   SET_SLOT(xControl,install("min.nse"      ), minNse);
-   SET_SLOT(xControl,install("fse"          ), FShkSE);      
-   SET_SLOT(xControl,install("rage"         ), LRcrtAge);  
-   SET_SLOT(xControl,install("qage"         ), ConQAge);   
-   SET_SLOT(xControl,install("shk.n"        ), shkN);     
-   SET_SLOT(xControl,install("shk.f"        ), shkF);      
-   SET_SLOT(xControl,install("shk.yrs"      ), shkyrs);    
-   SET_SLOT(xControl,install("shk.ages"     ), shkages);    
-   SET_SLOT(xControl,install("tsrange"      ), tsrange);     
-   SET_SLOT(xControl,install("tspower"      ), tspower);     
-   SET_SLOT(xControl,install("window"       ), TuningWindow);
-   SET_SLOT(xControl,install("vpa"          ), VPA);
+   SET_SLOT(xControl,Rf_install("tol"          ), MSStol);
+   SET_SLOT(xControl,Rf_install("maxit"        ), MaxIters);   
+   SET_SLOT(xControl,Rf_install("min.nse"      ), minNse);
+   SET_SLOT(xControl,Rf_install("fse"          ), FShkSE);      
+   SET_SLOT(xControl,Rf_install("rage"         ), LRcrtAge);  
+   SET_SLOT(xControl,Rf_install("qage"         ), ConQAge);   
+   SET_SLOT(xControl,Rf_install("shk.n"        ), shkN);     
+   SET_SLOT(xControl,Rf_install("shk.f"        ), shkF);      
+   SET_SLOT(xControl,Rf_install("shk.yrs"      ), shkyrs);    
+   SET_SLOT(xControl,Rf_install("shk.ages"     ), shkages);    
+   SET_SLOT(xControl,Rf_install("tsrange"      ), tsrange);     
+   SET_SLOT(xControl,Rf_install("tspower"      ), tspower);     
+   SET_SLOT(xControl,Rf_install("window"       ), TuningWindow);
+   SET_SLOT(xControl,Rf_install("vpa"          ), VPA);
    
    UNPROTECT(16);
    
@@ -672,11 +672,11 @@ SEXP ExtendedSurvivorsAnalysisR::dataframe(void)
    free_flallocArray(t, 1, 10, 10, 19);
       
    /* Assemble the base data frame. */
-//   PROTECT(names = allocVector(STRSXP, 1));
+//   PROTECT(names = Rf_allocVector(STRSXP, 1));
 
-   //SET_STRING_ELT(names, 0, mkChar("fleet"));
+   //SET_STRING_ELT(names, 0, Rf_mkChar("fleet"));
 
-   //setAttrib(data, R_NamesSymbol, names);
+   //Rf_setAttrib(data, R_NamesSymbol, names);
    
    UNPROTECT(2);
 
@@ -685,8 +685,8 @@ SEXP ExtendedSurvivorsAnalysisR::dataframe(void)
    /* To do this we must attach "class"  and */
    /* "row.names" attributes */
 
-   PROTECT(tmp = mkString("data.frame"));
-//   setAttrib(data, R_ClassSymbol, tmp);
+   PROTECT(tmp = Rf_mkString("data.frame"));
+//   Rf_setAttrib(data, R_ClassSymbol, tmp);
    UNPROTECT(1);
 
    return data;
@@ -800,8 +800,8 @@ void ExtendedSurvivorsAnalysisR::InputNF(SEXP xStock)
    { 
    TestFlag = false;
 
-   SEXP _N = PROTECT(duplicate(GET_SLOT(xStock, install("stock.n"))));
-   SEXP _F = PROTECT(duplicate(GET_SLOT(xStock, install("harvest"))));
+   SEXP _N = PROTECT(Rf_duplicate(GET_SLOT(xStock, Rf_install("stock.n"))));
+   SEXP _F = PROTECT(Rf_duplicate(GET_SLOT(xStock, Rf_install("harvest"))));
    
    if (InputFLQuant(_N, &N, MinAge, MaxAge, MinYear, MaxYear) &&
        InputFLQuant(_F, &F, MinAge, MaxAge, MinYear, MaxYear)    )
@@ -840,16 +840,16 @@ TuningFleetsR::TuningFleetsR(SEXP x, CatchData *pCatch, short TuningWindow)
       //int MinDimCatch[5],  MaxDimCatch[5],
       //    MinDimEffort[5], MaxDimEffort[5]; 
 
-      xIndex = PROTECT(duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), install("index"))));
-      vIndex = PROTECT(duplicate(GET_SLOT(xIndex, install(".Data"))));
+      xIndex = PROTECT(Rf_duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), Rf_install("index"))));
+      vIndex = PROTECT(Rf_duplicate(GET_SLOT(xIndex, Rf_install(".Data"))));
 //      GetFLQuantDims(vIndex, &MinDimCatch, &MaxDimCatch);
       
-//      SEXP xEffort = PROTECT(duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), install("effort"))));     
-//      SEXP vEffort = PROTECT(duplicate(GET_SLOT(xEffort, install(".Data"))));
+//      SEXP xEffort = PROTECT(Rf_duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), Rf_install("effort"))));     
+//      SEXP vEffort = PROTECT(Rf_duplicate(GET_SLOT(xEffort, Rf_install(".Data"))));
 //      GetFLQuantDims(vEffort, &MinDimEffort, &MaxDimEffort);
       
        //Get range
-      SEXP range    = PROTECT(duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), install("range"))));    
+      SEXP range    = PROTECT(Rf_duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), Rf_install("range"))));    
 
       alpha[iFleet] = REAL(range)[5];
       beta[ iFleet] = REAL(range)[6];
@@ -871,10 +871,10 @@ TuningFleetsR::TuningFleetsR(SEXP x, CatchData *pCatch, short TuningWindow)
    
    for (iFleet = 1; iFleet <= ArSmry.NFleet; iFleet++)
       {
-      SEXP xIndex  = PROTECT(duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), install("index"))));
+      SEXP xIndex  = PROTECT(Rf_duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), Rf_install("index"))));
       InputFLQuant(xIndex, &(Catch[iFleet]), ArSmry.MinAge[iFleet], ArSmry.MaxAge[iFleet], ArSmry.MinYear[iFleet], ArSmry.MaxYear[iFleet]);
       
-      //SEXP xEffort = PROTECT(duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), install("effort"))));     
+      //SEXP xEffort = PROTECT(Rf_duplicate(GET_SLOT(VECTOR_ELT(x, iFleet-1), Rf_install("effort"))));     
       //InputFLQuant(xEffort, &(Effort[iFleet]), ArSmry.MinYear[iFleet], ArSmry.MaxYear[iFleet]);
       
       for (int iYear = ArSmry.MinYear[iFleet]; iYear <= ArSmry.MaxYear[iFleet]; iYear++)

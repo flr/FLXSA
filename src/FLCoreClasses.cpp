@@ -19,13 +19,13 @@ const char *strlwr(const char *s)
 
 FLRConstSRR getSRType(SEXP v)      
    {
-   if (!isVector(v) || !isString(v))
+   if (!Rf_isVector(v) || !Rf_isString(v))
       return FLRConst_Mean;;
 
     SEXP dims     = GET_DIM(v),
          dimnames = GET_DIMNAMES(v);
 
-    short n = length(dims);
+    short n = Rf_length(dims);
 
     if (n != 1)
        return FLRConst_Mean;;
@@ -57,7 +57,7 @@ void InputAgeRange(SEXP obj, int *MinAge, int *MaxAge)
 	  
    double *a  = NUMERIC_POINTER(obj);
 
-   int n = length(obj);
+   int n = Rf_length(obj);
 
    for (int i=0; i<n; i++)
       {
@@ -78,7 +78,7 @@ int NElemList(SEXP x)
    if (!IS_LIST(x) || TYPEOF(x) != VECSXP) 
       return 0;
    else
-      return length(x);
+      return Rf_length(x);
   }
 
 bool isBool(SEXP t)
@@ -240,13 +240,13 @@ void FLQuant::Init(SEXP x)
     {
     if (InitFlag()) unalloc();
 
-    SEXP Quant    = GET_SLOT(x, install(".Data")),
+    SEXP Quant    = GET_SLOT(x, Rf_install(".Data")),
          dims     = GET_DIM(Quant),
          dimnames = GET_DIMNAMES(Quant);
 
     double *Q     = NUMERIC_POINTER(AS_NUMERIC(Quant));
 
-    int dim[6], n = length(dims);
+    int dim[6], n = Rf_length(dims);
 
     dim[0] = INTEGER(dims)[0];
     dim[1] = INTEGER(dims)[1];
@@ -373,7 +373,7 @@ SEXP FLQuant::Return(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = maxquant()-minquant() +1;
     INTEGER(dim)[1] = maxyr()   -minyr()    +1;
     INTEGER(dim)[2] = nunits(); 
@@ -385,26 +385,26 @@ SEXP FLQuant::Return(void)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, maxquant()-minquant() +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxquant()-minquant() +1));
     for (iAge=minquant(),i=0; iAge<=maxquant(); iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, maxyr()-minyr()+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, maxyr()-minyr()+1));
     for (iYear=minyr(), i=0; iYear<=maxyr(); iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     if (nunits()==1)
        {
-       PROTECT(d3 = allocVector(STRSXP, nunits()));
-       SET_STRING_ELT(d3, 0, mkChar("unique"));
+       PROTECT(d3 = Rf_allocVector(STRSXP, nunits()));
+       SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d3 = allocVector(INTSXP, nunits()));
+       PROTECT(d3 = Rf_allocVector(INTSXP, nunits()));
        for (iUnit=1, i=0; iUnit<=nunits(); iUnit++, i++)
           INTEGER(d3)[i] = iUnit; 
        }
@@ -412,12 +412,12 @@ SEXP FLQuant::Return(void)
        
     if (nseasons()==1)
        {
-       PROTECT(d4 = allocVector(STRSXP, nseasons()));
-       SET_STRING_ELT(d4, 0, mkChar("all"));
+       PROTECT(d4 = Rf_allocVector(STRSXP, nseasons()));
+       SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
        }
     else
        {
-       PROTECT(d4 = allocVector(INTSXP, nseasons()));
+       PROTECT(d4 = Rf_allocVector(INTSXP, nseasons()));
        for (iSeason=1, i=0; iSeason<=nseasons(); iSeason++, i++)
           INTEGER(d4)[i] = iSeason; 
        }
@@ -426,33 +426,33 @@ SEXP FLQuant::Return(void)
 
     if (nareas()==1)
        {
-       PROTECT(d5 = allocVector(STRSXP, nareas()));
-       SET_STRING_ELT(d5, 0, mkChar("unique"));
+       PROTECT(d5 = Rf_allocVector(STRSXP, nareas()));
+       SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d5 = allocVector(INTSXP, nareas()));
+       PROTECT(d5 = Rf_allocVector(INTSXP, nareas()));
        for (iArea=1, i=0; iArea<=nareas(); iArea++, i++)
           INTEGER(d5)[i] = iArea; 
        }
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(INTSXP, niters()));
+    PROTECT(d6 = Rf_allocVector(INTSXP, niters()));
     for (iIter=1, i=0; iIter<=niters(); iIter++, i++)
         INTEGER(d6)[i] = iIter; 
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter")); 
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter")); 
 
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
    
     //Set data
     i=0;
@@ -465,7 +465,7 @@ SEXP FLQuant::Return(void)
 			      			    REAL(v)[i++] = data[iAge][iYear][iUnit][iSeason][iArea][iIter]; 
                    
     //Set slot
-    Quant = R_do_slot_assign(Quant, install(".Data"), v);
+    Quant = R_do_slot_assign(Quant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -599,37 +599,37 @@ FLStock::FLStock(SEXP x)
    
 void FLStock::Init(SEXP x)
    {
-   minquant = (int)REAL(GET_SLOT(x, install("range")))[0];
-   maxquant = (int)REAL(GET_SLOT(x, install("range")))[1];
-   plusgrp  = (int)REAL(GET_SLOT(x, install("range")))[2];
-   minyr    = (int)REAL(GET_SLOT(x, install("range")))[3];
-   maxyr    = (int)REAL(GET_SLOT(x, install("range")))[4];
+   minquant = (int)REAL(GET_SLOT(x, Rf_install("range")))[0];
+   maxquant = (int)REAL(GET_SLOT(x, Rf_install("range")))[1];
+   plusgrp  = (int)REAL(GET_SLOT(x, Rf_install("range")))[2];
+   minyr    = (int)REAL(GET_SLOT(x, Rf_install("range")))[3];
+   maxyr    = (int)REAL(GET_SLOT(x, Rf_install("range")))[4];
  
    minfbar  = minquant; 
    maxfbar  = maxquant; 
    
-   if (LENGTH(GET_SLOT(x, install("range"))) >= 6)
-      minfbar  = (int)REAL(GET_SLOT(x, install("range")))[5];
-   if (LENGTH(GET_SLOT(x, install("range"))) >= 7)
-      maxfbar  = (int)REAL(GET_SLOT(x, install("range")))[6];
+   if (Rf_length(GET_SLOT(x, Rf_install("range"))) >= 6)
+      minfbar  = (int)REAL(GET_SLOT(x, Rf_install("range")))[5];
+   if (Rf_length(GET_SLOT(x, Rf_install("range"))) >= 7)
+      maxfbar  = (int)REAL(GET_SLOT(x, Rf_install("range")))[6];
    
-   catch_.Init(      GET_SLOT(x, install("catch"))); 
-   catch_n.Init(     GET_SLOT(x, install("catch.n"))); 
-   catch_wt.Init(    GET_SLOT(x, install("catch.wt"))); 
-   discards.Init(    GET_SLOT(x, install("discards"))); 
-   discards_n.Init(  GET_SLOT(x, install("discards.n"))); 
-   discards_wt.Init( GET_SLOT(x, install("discards.wt"))); 
-   landings.Init(    GET_SLOT(x, install("landings"))); 
-   landings_n.Init(  GET_SLOT(x, install("landings.n"))); 
-   landings_wt.Init( GET_SLOT(x, install("landings.wt"))); 
-   stock.Init(       GET_SLOT(x, install("stock"))); 
-   stock_n.Init(     GET_SLOT(x, install("stock.n"))); 
-   stock_wt.Init(    GET_SLOT(x, install("stock.wt"))); 
-   m.Init(           GET_SLOT(x, install("m"))); 
-   mat.Init(         GET_SLOT(x, install("mat"))); 
-   harvest.Init(     GET_SLOT(x, install("harvest"))); 
-   harvest_spwn.Init(GET_SLOT(x, install("harvest.spwn"))); 
-   m_spwn.Init(      GET_SLOT(x, install("m.spwn"))); 
+   catch_.Init(      GET_SLOT(x, Rf_install("catch"))); 
+   catch_n.Init(     GET_SLOT(x, Rf_install("catch.n"))); 
+   catch_wt.Init(    GET_SLOT(x, Rf_install("catch.wt"))); 
+   discards.Init(    GET_SLOT(x, Rf_install("discards"))); 
+   discards_n.Init(  GET_SLOT(x, Rf_install("discards.n"))); 
+   discards_wt.Init( GET_SLOT(x, Rf_install("discards.wt"))); 
+   landings.Init(    GET_SLOT(x, Rf_install("landings"))); 
+   landings_n.Init(  GET_SLOT(x, Rf_install("landings.n"))); 
+   landings_wt.Init( GET_SLOT(x, Rf_install("landings.wt"))); 
+   stock.Init(       GET_SLOT(x, Rf_install("stock"))); 
+   stock_n.Init(     GET_SLOT(x, Rf_install("stock.n"))); 
+   stock_wt.Init(    GET_SLOT(x, Rf_install("stock.wt"))); 
+   m.Init(           GET_SLOT(x, Rf_install("m"))); 
+   mat.Init(         GET_SLOT(x, Rf_install("mat"))); 
+   harvest.Init(     GET_SLOT(x, Rf_install("harvest"))); 
+   harvest_spwn.Init(GET_SLOT(x, Rf_install("harvest.spwn"))); 
+   m_spwn.Init(      GET_SLOT(x, Rf_install("m.spwn"))); 
 
    niters=1;
    niters= __max(niters,catch_.niters());         
@@ -824,15 +824,15 @@ SEXP FLStock::ReturnRange(void)
 
    SEXP names;
     
-   PROTECT(names = allocVector(STRSXP, 7));
-   SET_STRING_ELT(names, 0, mkChar("min"));
-   SET_STRING_ELT(names, 1, mkChar("max"));
-   SET_STRING_ELT(names, 2, mkChar("plusgroup"));
-   SET_STRING_ELT(names, 3, mkChar("minyear"));
-   SET_STRING_ELT(names, 4, mkChar("maxyear"));
-   SET_STRING_ELT(names, 5, mkChar("minfbar"));
-   SET_STRING_ELT(names, 6, mkChar("maxfbar"));
-   setAttrib(Range, R_NamesSymbol, names);
+   PROTECT(names = Rf_allocVector(STRSXP, 7));
+   SET_STRING_ELT(names, 0, Rf_mkChar("min"));
+   SET_STRING_ELT(names, 1, Rf_mkChar("max"));
+   SET_STRING_ELT(names, 2, Rf_mkChar("plusgroup"));
+   SET_STRING_ELT(names, 3, Rf_mkChar("minyear"));
+   SET_STRING_ELT(names, 4, Rf_mkChar("maxyear"));
+   SET_STRING_ELT(names, 5, Rf_mkChar("minfbar"));
+   SET_STRING_ELT(names, 6, Rf_mkChar("maxfbar"));
+   Rf_setAttrib(Range, R_NamesSymbol, names);
    
    return Range;
    }
@@ -844,24 +844,24 @@ SEXP FLStock::Return(void)
    PROTECT(Stock  = NEW_OBJECT(MAKE_CLASS("FLStock")));
    Range          = ReturnRange(); 
 
-   SET_SLOT(Stock, install("catch"),       catch_.Return());
-   SET_SLOT(Stock, install("catch.n"),     catch_n.Return());
-   SET_SLOT(Stock, install("catch.wt"),    catch_wt.Return());
-   SET_SLOT(Stock, install("discards"),    discards.Return());
-   SET_SLOT(Stock, install("discards.n"),  discards_n.Return());
-   SET_SLOT(Stock, install("discards.wt"), discards_wt.Return());
-   SET_SLOT(Stock, install("landings"),    landings.Return());
-   SET_SLOT(Stock, install("landings.n"),  landings_n.Return());
-   SET_SLOT(Stock, install("landings.wt"), landings_wt.Return());
-   SET_SLOT(Stock, install("stock"),       stock.Return());
-   SET_SLOT(Stock, install("stock.n"),     stock_n.Return());
-   SET_SLOT(Stock, install("stock.wt"),    stock_wt.Return());
-   SET_SLOT(Stock, install("mat"),         mat.Return());
-   SET_SLOT(Stock, install("harvest"),     harvest.Return()); 
-   SET_SLOT(Stock, install("harvest.spwn"),harvest_spwn.Return());
-   SET_SLOT(Stock, install("m"),           m.Return()); 
-   SET_SLOT(Stock, install("m.spwn"),      m_spwn.Return());
-   SET_SLOT(Stock, install("range"),       Range);
+   SET_SLOT(Stock, Rf_install("catch"),       catch_.Return());
+   SET_SLOT(Stock, Rf_install("catch.n"),     catch_n.Return());
+   SET_SLOT(Stock, Rf_install("catch.wt"),    catch_wt.Return());
+   SET_SLOT(Stock, Rf_install("discards"),    discards.Return());
+   SET_SLOT(Stock, Rf_install("discards.n"),  discards_n.Return());
+   SET_SLOT(Stock, Rf_install("discards.wt"), discards_wt.Return());
+   SET_SLOT(Stock, Rf_install("landings"),    landings.Return());
+   SET_SLOT(Stock, Rf_install("landings.n"),  landings_n.Return());
+   SET_SLOT(Stock, Rf_install("landings.wt"), landings_wt.Return());
+   SET_SLOT(Stock, Rf_install("stock"),       stock.Return());
+   SET_SLOT(Stock, Rf_install("stock.n"),     stock_n.Return());
+   SET_SLOT(Stock, Rf_install("stock.wt"),    stock_wt.Return());
+   SET_SLOT(Stock, Rf_install("mat"),         mat.Return());
+   SET_SLOT(Stock, Rf_install("harvest"),     harvest.Return()); 
+   SET_SLOT(Stock, Rf_install("harvest.spwn"),harvest_spwn.Return());
+   SET_SLOT(Stock, Rf_install("m"),           m.Return()); 
+   SET_SLOT(Stock, Rf_install("m.spwn"),      m_spwn.Return());
+   SET_SLOT(Stock, Rf_install("range"),       Range);
       
    UNPROTECT(3);
 
@@ -883,13 +883,13 @@ FLIndex::FLIndex(SEXP x)
    
 void FLIndex::Init(SEXP x)
    {
-   minquant   = (int)REAL(GET_SLOT(x, install("range")))[0];
-   maxquant   = (int)REAL(GET_SLOT(x, install("range")))[1];
-   plusgrp    = (int)REAL(GET_SLOT(x, install("range")))[2];
-   minyr      = (int)REAL(GET_SLOT(x, install("range")))[3];
-   maxyr      = (int)REAL(GET_SLOT(x, install("range")))[4];
-   startf      = (int)REAL(GET_SLOT(x, install("range")))[5];
-   endf        = (int)REAL(GET_SLOT(x, install("range")))[6];
+   minquant   = (int)REAL(GET_SLOT(x, Rf_install("range")))[0];
+   maxquant   = (int)REAL(GET_SLOT(x, Rf_install("range")))[1];
+   plusgrp    = (int)REAL(GET_SLOT(x, Rf_install("range")))[2];
+   minyr      = (int)REAL(GET_SLOT(x, Rf_install("range")))[3];
+   maxyr      = (int)REAL(GET_SLOT(x, Rf_install("range")))[4];
+   startf      = (int)REAL(GET_SLOT(x, Rf_install("range")))[5];
+   endf        = (int)REAL(GET_SLOT(x, Rf_install("range")))[6];
    
    nunits   = 1;
    nseasons = 1;
@@ -898,13 +898,13 @@ void FLIndex::Init(SEXP x)
 
    index.Init(    0, 0, index.minyr(),index.maxyr(),index.nunits(),index.nseasons(),index.nareas(), index.niters(), 1.0);
    index_var.Init(0, 0, index.minyr(),index.maxyr(),index.nunits(),index.nseasons(),index.nareas(), index.niters(), 1.0);
-   index.Init(    GET_SLOT(x, install("index"))); 
-   index_var.Init(GET_SLOT(x, install("index.var"))); 
-   catch_n.Init(    GET_SLOT(x, install("catch.n"))); 
-   catch_wt.Init(    GET_SLOT(x, install("catch.wt"))); 
-   effort.Init(    GET_SLOT(x, install("effort"))); 
-   sel_pattern.Init(    GET_SLOT(x, install("sel.pattern"))); 
-   index_q.Init(    GET_SLOT(x, install("index.q"))); 
+   index.Init(    GET_SLOT(x, Rf_install("index"))); 
+   index_var.Init(GET_SLOT(x, Rf_install("index.var"))); 
+   catch_n.Init(    GET_SLOT(x, Rf_install("catch.n"))); 
+   catch_wt.Init(    GET_SLOT(x, Rf_install("catch.wt"))); 
+   effort.Init(    GET_SLOT(x, Rf_install("effort"))); 
+   sel_pattern.Init(    GET_SLOT(x, Rf_install("sel.pattern"))); 
+   index_q.Init(    GET_SLOT(x, Rf_install("index.q"))); 
    
    //need to check seasons, areas, units & iterations
    }
@@ -929,14 +929,14 @@ SEXP FLIndex::Return(void)
    REAL(Range)[5] = startf;
    REAL(Range)[6] = endf;
    
-   SET_SLOT(Index, install("range"),      Range);
-   SET_SLOT(Index, install("index"),      index.Return());
-   SET_SLOT(Index, install("index.var"),  index_var.Return());
-   SET_SLOT(Index, install("catch.n"),      catch_n.Return());
-   SET_SLOT(Index, install("catch.wt"),      catch_wt.Return());
-   SET_SLOT(Index, install("effort"),      catch_n.Return());
-   SET_SLOT(Index, install("sel.pattern"),      sel_pattern.Return());
-   SET_SLOT(Index, install("index.q"),      index_q.Return());
+   SET_SLOT(Index, Rf_install("range"),      Range);
+   SET_SLOT(Index, Rf_install("index"),      index.Return());
+   SET_SLOT(Index, Rf_install("index.var"),  index_var.Return());
+   SET_SLOT(Index, Rf_install("catch.n"),      catch_n.Return());
+   SET_SLOT(Index, Rf_install("catch.wt"),      catch_wt.Return());
+   SET_SLOT(Index, Rf_install("effort"),      catch_n.Return());
+   SET_SLOT(Index, Rf_install("sel.pattern"),      sel_pattern.Return());
+   SET_SLOT(Index, Rf_install("index.q"),      index_q.Return());
       
    UNPROTECT(2);
 
@@ -958,22 +958,22 @@ FLBiol::FLBiol(SEXP x)
    
 void FLBiol::Init(SEXP x)
    {
-   minquant   = (int)REAL(GET_SLOT(x, install("range")))[0];
-   maxquant   = (int)REAL(GET_SLOT(x, install("range")))[1];
-   plusgrp    = (int)REAL(GET_SLOT(x, install("range")))[2];
-   minyr      = (int)REAL(GET_SLOT(x, install("range")))[3];
-   maxyr      = (int)REAL(GET_SLOT(x, install("range")))[4];
+   minquant   = (int)REAL(GET_SLOT(x, Rf_install("range")))[0];
+   maxquant   = (int)REAL(GET_SLOT(x, Rf_install("range")))[1];
+   plusgrp    = (int)REAL(GET_SLOT(x, Rf_install("range")))[2];
+   minyr      = (int)REAL(GET_SLOT(x, Rf_install("range")))[3];
+   maxyr      = (int)REAL(GET_SLOT(x, Rf_install("range")))[4];
    
    nunits   = 1;
    nseasons = 1;
    nareas   = 1;
    niters   = 1;
 
-   n.Init(   GET_SLOT(x, install("n"))); 
-   m.Init(   GET_SLOT(x, install("m"))); 
-   wt.Init(  GET_SLOT(x, install("wt"))); 
-   fec.Init( GET_SLOT(x, install("fec"))); 
-   spwn.Init(GET_SLOT(x, install("spwn"))); 
+   n.Init(   GET_SLOT(x, Rf_install("n"))); 
+   m.Init(   GET_SLOT(x, Rf_install("m"))); 
+   wt.Init(  GET_SLOT(x, Rf_install("wt"))); 
+   fec.Init( GET_SLOT(x, Rf_install("fec"))); 
+   spwn.Init(GET_SLOT(x, Rf_install("spwn"))); 
    
    //need to check seasons, areas & units
    }
@@ -996,13 +996,13 @@ SEXP FLBiol::Return(void)
    REAL(Range)[3] = minyr;
    REAL(Range)[4] = maxyr;
        
-   SET_SLOT(Biol, install("n"),       n.Return());
-   SET_SLOT(Biol, install("m"),       m.Return());
-   SET_SLOT(Biol, install("wt"),      wt.Return());
-   SET_SLOT(Biol, install("fec"),     fec.Return());
-   SET_SLOT(Biol, install("spwn"),    spwn.Return());
+   SET_SLOT(Biol, Rf_install("n"),       n.Return());
+   SET_SLOT(Biol, Rf_install("m"),       m.Return());
+   SET_SLOT(Biol, Rf_install("wt"),      wt.Return());
+   SET_SLOT(Biol, Rf_install("fec"),     fec.Return());
+   SET_SLOT(Biol, Rf_install("spwn"),    spwn.Return());
 
-   SET_SLOT(Biol, install("range"),   Range);
+   SET_SLOT(Biol, Rf_install("range"),   Range);
       
    UNPROTECT(2);
 
@@ -1036,16 +1036,16 @@ void FLVector::Init(SEXP x)
    SEXP v;
    int n;
 
-   if (!isVector(x) || !isNumeric(x)) 
+   if (!Rf_isVector(x) || !Rf_isNumeric(x)) 
       return;
 
    PROTECT(v = AS_NUMERIC(x));
-   n = LENGTH(v);
+   n = Rf_length(v);
 
    double *d = NUMERIC_POINTER(v); 
 
    SEXP names = GET_NAMES(v);
-   if (LENGTH(names) == n) //index by name
+   if (Rf_length(names) == n) //index by name
       {
       //get indices
       mindim = atoi(CHAR(STRING_ELT(names, 0))); 
@@ -1100,16 +1100,16 @@ SEXP FLVector::Return(void)
     v = PROTECT(NEW_NUMERIC(maxdim-mindim+1)); 
   
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 1));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 1));       
     INTEGER(dim)[0] = maxdim-mindim+1;
         
     //Allocate memory
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 1));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 1));
     
-    PROTECT(d1 = allocVector(INTSXP, maxdim-mindim+1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxdim-mindim+1));
     for (j=mindim, i=0; j<=maxdim; j++, i++)
         INTEGER(d1)[i] = j; 
     SET_VECTOR_ELT(dimnames, 1, d1);
@@ -1172,16 +1172,16 @@ void FLBool::Init(SEXP x)
    SEXP v;
    int n;
 
-   if (!isLogical(x)) 
+   if (!Rf_isLogical(x)) 
       return;
 
    PROTECT(v = AS_LOGICAL(x));
-   n = LENGTH(v);
+   n = Rf_length(v);
 
    int *d = LOGICAL_POINTER(v); 
 
    SEXP names = GET_NAMES(v);
-   if (LENGTH(names) == n) //index by name
+   if (Rf_length(names) == n) //index by name
       {
       //get indices
       mindim = atoi(CHAR(STRING_ELT(names, 0))); 
@@ -1221,16 +1221,16 @@ SEXP FLBool::Return(void)
     v = PROTECT(NEW_NUMERIC(maxdim-mindim+1)); 
   
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 1));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 1));       
     INTEGER(dim)[0] = maxdim-mindim+1;
         
     //Allocate memory
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 1));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 1));
     
-    PROTECT(d1 = allocVector(INTSXP, maxdim-mindim+1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxdim-mindim+1));
     for (j=mindim, i=0; j<=maxdim; j++, i++)
         INTEGER(d1)[i] = j; 
     SET_VECTOR_ELT(dimnames, 1, d1);
@@ -1314,12 +1314,12 @@ FL2D::FL2D(SEXP x)
 
 void FL2D::Init(SEXP x)      
     {
-    if (isMatrix(x)  && isNumeric(x))
+    if (Rf_isMatrix(x)  && Rf_isNumeric(x))
        {
        SEXP dims     = GET_DIM(x),
             dimnames = GET_DIMNAMES(x);
 
-       int dim[2], n = length(dims);
+       int dim[2], n = Rf_length(dims);
 
        if (n !=2) return;
 
@@ -1379,17 +1379,17 @@ void FL2D::Init(SEXP x)
           for (i2 = min2, j = 0; i2 <= max2; i2++, j++)
              data[i1][i2] = (a)[i + j*(max1-min1+1)];       
        }
-    else if (isVector(x)  && isNumeric(x))
+    else if (Rf_isVector(x)  && Rf_isNumeric(x))
        {
        SEXP v;
 
        PROTECT(v = AS_NUMERIC(x));
-       int n = LENGTH(v);
+       int n = Rf_length(v);
 
        double *d = NUMERIC_POINTER(v); 
 
        SEXP names = GET_NAMES(v);
-       if (LENGTH(names) == n) //index by name
+       if (Rf_length(names) == n) //index by name
           {
           int  t = 0;
           const char *c;
@@ -1452,7 +1452,7 @@ SEXP FL2D::Return(void)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 2));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 2));       
     INTEGER(dim)[0] = max1 -min1 +1;
     INTEGER(dim)[1] = max2-min2+1;
         
@@ -1460,19 +1460,19 @@ SEXP FL2D::Return(void)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 2));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 2));
     
-    PROTECT(d1 = allocVector(INTSXP, max1-min1 +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, max1-min1 +1));
     for (i_=min1, i=0; i_<=max1; i_++, i++)
         INTEGER(d1)[i] = i_; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, max2-min2+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, max2-min2+1));
     for (j_=min2, i=0; j_<=max2; j_++, i++)
         INTEGER(d2)[i] = j_; 
     SET_VECTOR_ELT(dimnames, 1, d2);
     
-    setAttrib(v, install("dimnames"), dimnames);
+    Rf_setAttrib(v, Rf_install("dimnames"), dimnames);
      
     //Set data
     for (i_=min1, i=0; i_<=max1; i_++, i++)
@@ -1533,26 +1533,26 @@ FLCatch::~FLCatch(void)
 void FLCatch::Init(SEXP x)
    {
 
-   minquant  = (int)REAL(GET_SLOT(x, install("range")))[0];
-   maxquant  = (int)REAL(GET_SLOT(x, install("range")))[1];
-   plusgrp   = (int)REAL(GET_SLOT(x, install("range")))[2];
-   minyr     = (int)REAL(GET_SLOT(x, install("range")))[3];
-   maxyr     = (int)REAL(GET_SLOT(x, install("range")))[4];
+   minquant  = (int)REAL(GET_SLOT(x, Rf_install("range")))[0];
+   maxquant  = (int)REAL(GET_SLOT(x, Rf_install("range")))[1];
+   plusgrp   = (int)REAL(GET_SLOT(x, Rf_install("range")))[2];
+   minyr     = (int)REAL(GET_SLOT(x, Rf_install("range")))[3];
+   maxyr     = (int)REAL(GET_SLOT(x, Rf_install("range")))[4];
 
-   catch_q.Init(     GET_SLOT(x, install("catch.q")));
-   catch_.Init(      GET_SLOT(x, install("catch")));
-   catch_n.Init(     GET_SLOT(x, install("catch.n")));
-   catch_wt.Init(    GET_SLOT(x, install("catch.wt")));
-   catch_sel.Init(   GET_SLOT(x, install("catch.sel")));
-   discards.Init(    GET_SLOT(x, install("discards")));
-   discards_n.Init(  GET_SLOT(x, install("discards.n")));
-   discards_wt.Init( GET_SLOT(x, install("discards.wt")));
-   discards_sel.Init(GET_SLOT(x, install("discards.sel")));
-   landings.Init(    GET_SLOT(x, install("landings")));
-   landings_n.Init(  GET_SLOT(x, install("landings.n")));
-   landings_wt.Init( GET_SLOT(x, install("landings.wt")));
-   landings_sel.Init(GET_SLOT(x, install("landings.sel")));
-   price.Init(       GET_SLOT(x, install("price")));
+   catch_q.Init(     GET_SLOT(x, Rf_install("catch.q")));
+   catch_.Init(      GET_SLOT(x, Rf_install("catch")));
+   catch_n.Init(     GET_SLOT(x, Rf_install("catch.n")));
+   catch_wt.Init(    GET_SLOT(x, Rf_install("catch.wt")));
+   catch_sel.Init(   GET_SLOT(x, Rf_install("catch.sel")));
+   discards.Init(    GET_SLOT(x, Rf_install("discards")));
+   discards_n.Init(  GET_SLOT(x, Rf_install("discards.n")));
+   discards_wt.Init( GET_SLOT(x, Rf_install("discards.wt")));
+   discards_sel.Init(GET_SLOT(x, Rf_install("discards.sel")));
+   landings.Init(    GET_SLOT(x, Rf_install("landings")));
+   landings_n.Init(  GET_SLOT(x, Rf_install("landings.n")));
+   landings_wt.Init( GET_SLOT(x, Rf_install("landings.wt")));
+   landings_sel.Init(GET_SLOT(x, Rf_install("landings.sel")));
+   price.Init(       GET_SLOT(x, Rf_install("price")));
 
    InitFlag = true;
    }
@@ -1571,20 +1571,20 @@ SEXP FLCatch::Return(void)
    REAL(Range)[3] = minyr;
    REAL(Range)[4] = maxyr;
    
-   SET_SLOT(Catch, install("catch"),       catch_.Return());
-   SET_SLOT(Catch, install("catch.q"),     catch_q.Return());            
-	SET_SLOT(Catch, install("catch.n"),     catch_n.Return());      
-	SET_SLOT(Catch, install("catch.wt"),    catch_wt.Return());     
-   SET_SLOT(Catch, install("catch.sel"),   catch_sel.Return());    
-	SET_SLOT(Catch, install("discards"),    discards.Return());     
-	SET_SLOT(Catch, install("discards.n"),  discards_n.Return());   
-	SET_SLOT(Catch, install("discards.wt"), discards_wt.Return());  
-	SET_SLOT(Catch, install("discards.sel"),discards_sel.Return()); 
-	SET_SLOT(Catch, install("landings"),    landings.Return());     
-	SET_SLOT(Catch, install("landings.n"),  landings_n.Return());   
-	SET_SLOT(Catch, install("landings.wt"), landings_wt.Return());  
-	SET_SLOT(Catch, install("landings.sel"),landings_sel.Return());  
-   SET_SLOT(Catch, install("price"),       price.Return());         
+   SET_SLOT(Catch, Rf_install("catch"),       catch_.Return());
+   SET_SLOT(Catch, Rf_install("catch.q"),     catch_q.Return());            
+	SET_SLOT(Catch, Rf_install("catch.n"),     catch_n.Return());      
+	SET_SLOT(Catch, Rf_install("catch.wt"),    catch_wt.Return());     
+   SET_SLOT(Catch, Rf_install("catch.sel"),   catch_sel.Return());    
+	SET_SLOT(Catch, Rf_install("discards"),    discards.Return());     
+	SET_SLOT(Catch, Rf_install("discards.n"),  discards_n.Return());   
+	SET_SLOT(Catch, Rf_install("discards.wt"), discards_wt.Return());  
+	SET_SLOT(Catch, Rf_install("discards.sel"),discards_sel.Return()); 
+	SET_SLOT(Catch, Rf_install("landings"),    landings.Return());     
+	SET_SLOT(Catch, Rf_install("landings.n"),  landings_n.Return());   
+	SET_SLOT(Catch, Rf_install("landings.wt"), landings_wt.Return());  
+	SET_SLOT(Catch, Rf_install("landings.sel"),landings_sel.Return());  
+   SET_SLOT(Catch, Rf_install("price"),       price.Return());         
 
       
    UNPROTECT(2);
@@ -1623,22 +1623,22 @@ void  FLFleet::Init(SEXP x)
    {
    if (nunits >= 1 || nseasons >= 1 || nareas >= 1 || nspp >= 1) unalloc();
 
-   minquant = (int)REAL(GET_SLOT(x, install("range")))[0];
-   maxquant = (int)REAL(GET_SLOT(x, install("range")))[1];
-   plusgrp  = (int)REAL(GET_SLOT(x, install("range")))[2];
-   minyr    = (int)REAL(GET_SLOT(x, install("range")))[3];
-   maxyr    = (int)REAL(GET_SLOT(x, install("range")))[4];
+   minquant = (int)REAL(GET_SLOT(x, Rf_install("range")))[0];
+   maxquant = (int)REAL(GET_SLOT(x, Rf_install("range")))[1];
+   plusgrp  = (int)REAL(GET_SLOT(x, Rf_install("range")))[2];
+   minyr    = (int)REAL(GET_SLOT(x, Rf_install("range")))[3];
+   maxyr    = (int)REAL(GET_SLOT(x, Rf_install("range")))[4];
    
    nunits   = 1;
    nseasons = 1;
    nareas   = 1;
    
-   effort.Init(   GET_SLOT(x, install("effort"))); 
-   capacity.Init( GET_SLOT(x, install("capacity")));   
-   crewshare.Init(GET_SLOT(x, install("crewshare")));
-   fcost.Init(    GET_SLOT(x, install("fcost"))); 
+   effort.Init(   GET_SLOT(x, Rf_install("effort"))); 
+   capacity.Init( GET_SLOT(x, Rf_install("capacity")));   
+   crewshare.Init(GET_SLOT(x, Rf_install("crewshare")));
+   fcost.Init(    GET_SLOT(x, Rf_install("fcost"))); 
 
-   SEXP metiers = PROTECT(GET_SLOT(x, install("metiers")));
+   SEXP metiers = PROTECT(GET_SLOT(x, Rf_install("metiers")));
   
    nmetier = NElemList(metiers);
 
@@ -1647,7 +1647,7 @@ void  FLFleet::Init(SEXP x)
    effshare.alloc_n7(nmetier);
    vcost.alloc_n7(   nmetier);
 
-   SEXP catches = PROTECT(GET_SLOT(VECTOR_ELT(metiers, 0), install("catches")));
+   SEXP catches = PROTECT(GET_SLOT(VECTOR_ELT(metiers, 0), Rf_install("catches")));
   
    nspp = NElemList(catches);
 
@@ -1671,10 +1671,10 @@ void  FLFleet::Init(SEXP x)
    for (int i=1; i<=nmetier; i++)
       {
       SEXP metier  = PROTECT(VECTOR_ELT(metiers, i-1));
-      SEXP catches = PROTECT(GET_SLOT(metier, install("catches")));
+      SEXP catches = PROTECT(GET_SLOT(metier, Rf_install("catches")));
 
-      effshare.Init(i, GET_SLOT(metier, install("effshare"))); 
-      vcost.Init(   i, GET_SLOT(metier, install("vcost"))); 
+      effshare.Init(i, GET_SLOT(metier, Rf_install("effshare"))); 
+      vcost.Init(   i, GET_SLOT(metier, Rf_install("vcost"))); 
   
       nspp = NElemList(catches);
 
@@ -1684,20 +1684,20 @@ void  FLFleet::Init(SEXP x)
          {
          SEXP t = PROTECT(VECTOR_ELT(catches, j-1));
 
-         catch_.Init(      i, j, GET_SLOT(t, install("catch"))); 
-         catch_n.Init(     i, j, GET_SLOT(t, install("catch.n"))); 
-         catch_wt.Init(    i, j, GET_SLOT(t, install("catch.wt"))); 
-         catch_sel.Init(   i, j, GET_SLOT(t, install("catch.sel"))); 
-         catch_q.Init(     i, j, GET_SLOT(t, install("catch.q"))); 
-         landings.Init(    i, j, GET_SLOT(t, install("landings"))); 
-         landings_n.Init(  i, j, GET_SLOT(t, install("landings.n"))); 
-         landings_wt.Init( i, j, GET_SLOT(t, install("landings.wt"))); 
-         landings_sel.Init(i, j, GET_SLOT(t, install("landings.sel"))); 
-         discards.Init(    i, j, GET_SLOT(t, install("discards"))); 
-         discards_n.Init(  i, j, GET_SLOT(t, install("discards.n"))); 
-         discards_wt.Init( i, j, GET_SLOT(t, install("discards.wt"))); 
-         discards_sel.Init(i, j, GET_SLOT(t, install("discards.sel"))); 
-         price.Init(       i, j, GET_SLOT(t, install("price"))); 
+         catch_.Init(      i, j, GET_SLOT(t, Rf_install("catch"))); 
+         catch_n.Init(     i, j, GET_SLOT(t, Rf_install("catch.n"))); 
+         catch_wt.Init(    i, j, GET_SLOT(t, Rf_install("catch.wt"))); 
+         catch_sel.Init(   i, j, GET_SLOT(t, Rf_install("catch.sel"))); 
+         catch_q.Init(     i, j, GET_SLOT(t, Rf_install("catch.q"))); 
+         landings.Init(    i, j, GET_SLOT(t, Rf_install("landings"))); 
+         landings_n.Init(  i, j, GET_SLOT(t, Rf_install("landings.n"))); 
+         landings_wt.Init( i, j, GET_SLOT(t, Rf_install("landings.wt"))); 
+         landings_sel.Init(i, j, GET_SLOT(t, Rf_install("landings.sel"))); 
+         discards.Init(    i, j, GET_SLOT(t, Rf_install("discards"))); 
+         discards_n.Init(  i, j, GET_SLOT(t, Rf_install("discards.n"))); 
+         discards_wt.Init( i, j, GET_SLOT(t, Rf_install("discards.wt"))); 
+         discards_sel.Init(i, j, GET_SLOT(t, Rf_install("discards.sel"))); 
+         price.Init(       i, j, GET_SLOT(t, Rf_install("price"))); 
          }
        }
 
@@ -1727,56 +1727,56 @@ SEXP  FLFleet::Return(void)
    REAL(Range)[3] = minyr;
    REAL(Range)[4] = maxyr;
    
-   SET_SLOT(fleet, install("range"),      Range);         
-   SET_SLOT(fleet, install("effort"),     effort.Return());         
-   SET_SLOT(fleet, install("capacity"),   capacity.Return());         
-   SET_SLOT(fleet, install("crewshare"),  crewshare.Return());         
-   SET_SLOT(fleet, install("fcost"),      fcost.Return());         
-   SET_SLOT(fleet, install("vcost"),      vcost.Return());         
+   SET_SLOT(fleet, Rf_install("range"),      Range);         
+   SET_SLOT(fleet, Rf_install("effort"),     effort.Return());         
+   SET_SLOT(fleet, Rf_install("capacity"),   capacity.Return());         
+   SET_SLOT(fleet, Rf_install("crewshare"),  crewshare.Return());         
+   SET_SLOT(fleet, Rf_install("fcost"),      fcost.Return());         
+   SET_SLOT(fleet, Rf_install("vcost"),      vcost.Return());         
    
    SEXP metiers      = NEW_OBJECT(MAKE_CLASS("FLMetiers"));
-   SEXP metiers_data = allocVector(VECSXP, nmetier);        
+   SEXP metiers_data = Rf_allocVector(VECSXP, nmetier);        
    
    for (int i=1; i<=nmetier; i++)
       {
       SEXP metier = NEW_OBJECT(MAKE_CLASS("FLMetier"));
 
-      SET_SLOT(metier, install("effshare"), effshare.Return(i));         
-      SET_SLOT(metier, install("vcost"),    vcost.Return(i));         
+      SET_SLOT(metier, Rf_install("effshare"), effshare.Return(i));         
+      SET_SLOT(metier, Rf_install("vcost"),    vcost.Return(i));         
  
       SEXP catches    = NEW_OBJECT(MAKE_CLASS("FLCatches"));
-      SEXP catch_data = allocVector(VECSXP, nspp);        
+      SEXP catch_data = Rf_allocVector(VECSXP, nspp);        
    
       for (int j=1; j<=nspp; j++)
          {
          SEXP _catch = NEW_OBJECT(MAKE_CLASS("FLCatch"));
       
-         SET_SLOT(_catch, install("catch"),        catch_.Return(i,j));
-         SET_SLOT(_catch, install("catch.n"),      catch_n.Return(i,j));
-         SET_SLOT(_catch, install("catch.wt"),     catch_wt.Return(i,j));
-         SET_SLOT(_catch, install("catch.sel"),    catch_sel.Return(i,j));
-         SET_SLOT(_catch, install("catch.q"),      catch_q.Return(i,j));
-         SET_SLOT(_catch, install("landings"),     landings.Return(i,j));
-         SET_SLOT(_catch, install("landings.n"),   landings_n.Return(i,j));
-         SET_SLOT(_catch, install("landings.wt"),  landings_wt.Return(i,j));
-         SET_SLOT(_catch, install("landings.sel"), landings_sel.Return(i,j));
-         SET_SLOT(_catch, install("discards"),     discards.Return(i,j));
-         SET_SLOT(_catch, install("discards.n"),   discards_n.Return(i,j));
-         SET_SLOT(_catch, install("discards.wt"),  discards_wt.Return(i,j));
-         SET_SLOT(_catch, install("discards.sel"), discards_sel.Return(i,j));
-         SET_SLOT(_catch, install("price"),        price.Return(i,j));
+         SET_SLOT(_catch, Rf_install("catch"),        catch_.Return(i,j));
+         SET_SLOT(_catch, Rf_install("catch.n"),      catch_n.Return(i,j));
+         SET_SLOT(_catch, Rf_install("catch.wt"),     catch_wt.Return(i,j));
+         SET_SLOT(_catch, Rf_install("catch.sel"),    catch_sel.Return(i,j));
+         SET_SLOT(_catch, Rf_install("catch.q"),      catch_q.Return(i,j));
+         SET_SLOT(_catch, Rf_install("landings"),     landings.Return(i,j));
+         SET_SLOT(_catch, Rf_install("landings.n"),   landings_n.Return(i,j));
+         SET_SLOT(_catch, Rf_install("landings.wt"),  landings_wt.Return(i,j));
+         SET_SLOT(_catch, Rf_install("landings.sel"), landings_sel.Return(i,j));
+         SET_SLOT(_catch, Rf_install("discards"),     discards.Return(i,j));
+         SET_SLOT(_catch, Rf_install("discards.n"),   discards_n.Return(i,j));
+         SET_SLOT(_catch, Rf_install("discards.wt"),  discards_wt.Return(i,j));
+         SET_SLOT(_catch, Rf_install("discards.sel"), discards_sel.Return(i,j));
+         SET_SLOT(_catch, Rf_install("price"),        price.Return(i,j));
 
          SET_VECTOR_ELT(catch_data, j-1, _catch); 
          }
-      catches = R_do_slot_assign(catches, install(".Data"), catch_data);
+      catches = R_do_slot_assign(catches, Rf_install(".Data"), catch_data);
     
-      SET_SLOT(metier, install("catches"), catches);
+      SET_SLOT(metier, Rf_install("catches"), catches);
       
       SET_VECTOR_ELT(metiers_data, i-1, metier); 
       }
-   metiers = R_do_slot_assign(metiers, install(".Data"), metiers_data);
+   metiers = R_do_slot_assign(metiers, Rf_install(".Data"), metiers_data);
       
-   SET_SLOT(fleet, install("metiers"), metiers);
+   SET_SLOT(fleet, Rf_install("metiers"), metiers);
    
    return fleet;
    }
@@ -1893,13 +1893,13 @@ void FLQuant2::Init(int i7, SEXP x)
    if (InitFlag(i7)) 
       unalloc(i7);
 
-   SEXP Quant    = GET_SLOT(x, install(".Data")),
+   SEXP Quant    = GET_SLOT(x, Rf_install(".Data")),
         dims     = GET_DIM(Quant),
         dimnames = GET_DIMNAMES(Quant);
 
    double *Q     = NUMERIC_POINTER(AS_NUMERIC(Quant));
 
-   int dim[6], n = length(dims);
+   int dim[6], n = Rf_length(dims);
 
    dim[0] = INTEGER(dims)[0];
    dim[1] = INTEGER(dims)[1];
@@ -2046,7 +2046,7 @@ SEXP FLQuant2::Return(int i7)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = maxquant(i7)-minquant(i7) +1;
     INTEGER(dim)[1] = maxyr(i7)   -minyr(i7)    +1;
     INTEGER(dim)[2] = nunits(i7); 
@@ -2058,26 +2058,26 @@ SEXP FLQuant2::Return(int i7)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, maxquant(i7)-minquant(i7) +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxquant(i7)-minquant(i7) +1));
     for (iAge=minquant(i7), i=0; iAge<=maxquant(i7); iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, maxyr(i7)-minyr(i7)+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, maxyr(i7)-minyr(i7)+1));
     for (iYear=minyr(i7), i=0; iYear<=maxyr(i7); iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     if (nunits(i7)==1)
        {
-       PROTECT(d3 = allocVector(STRSXP, nunits(i7)));
-       SET_STRING_ELT(d3, 0, mkChar("unique"));
+       PROTECT(d3 = Rf_allocVector(STRSXP, nunits(i7)));
+       SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d3 = allocVector(INTSXP, nunits(i7)));
+       PROTECT(d3 = Rf_allocVector(INTSXP, nunits(i7)));
        for (iUnit=1, i=0; iUnit<=nunits(i7); iUnit++, i++)
           INTEGER(d3)[i] = iUnit; 
        }
@@ -2085,12 +2085,12 @@ SEXP FLQuant2::Return(int i7)
        
     if (nseasons(i7)==1)
        {
-       PROTECT(d4 = allocVector(STRSXP, nseasons(i7)));
-       SET_STRING_ELT(d4, 0, mkChar("all"));
+       PROTECT(d4 = Rf_allocVector(STRSXP, nseasons(i7)));
+       SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
        }
     else
        {
-       PROTECT(d4 = allocVector(INTSXP, nseasons(i7)));
+       PROTECT(d4 = Rf_allocVector(INTSXP, nseasons(i7)));
        for (iSeason=1, i=0; iSeason<=nseasons(i7); iSeason++, i++)
           INTEGER(d4)[i] = iSeason; 
        }
@@ -2099,33 +2099,33 @@ SEXP FLQuant2::Return(int i7)
 
     if (nareas(i7)==1)
        {
-       PROTECT(d5 = allocVector(STRSXP, nareas(i7)));
-       SET_STRING_ELT(d5, 0, mkChar("unique"));
+       PROTECT(d5 = Rf_allocVector(STRSXP, nareas(i7)));
+       SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d5 = allocVector(INTSXP, nareas(i7)));
+       PROTECT(d5 = Rf_allocVector(INTSXP, nareas(i7)));
        for (iArea=1, i=0; iArea<=nareas(i7); iArea++, i++)
           INTEGER(d5)[i] = iArea; 
        }
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(INTSXP, niters(i7)));
+    PROTECT(d6 = Rf_allocVector(INTSXP, niters(i7)));
     for (iIter=1, i=0; iIter<=niters(i7); iIter++, i++)
         INTEGER(d6)[i] = iIter; 
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter")); 
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter")); 
  
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
    
     //Set data
     i=0;
@@ -2138,7 +2138,7 @@ SEXP FLQuant2::Return(int i7)
 			      			    REAL(v)[i++] = data[i7][iAge][iYear][iUnit][iSeason][iArea][iIter]; 
                    
     //Set slot
-    Quant = R_do_slot_assign(Quant, install(".Data"), v);
+    Quant = R_do_slot_assign(Quant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -2149,7 +2149,7 @@ SEXP FLQuant2::Return(void)
    {
    SEXP ReturnObject;
 
-   PROTECT(ReturnObject = allocVector(VECSXP,flq_n));
+   PROTECT(ReturnObject = Rf_allocVector(VECSXP,flq_n));
    for (int i=0; i<flq_n; i++)
       SET_VECTOR_ELT(ReturnObject, i,  Return(i+1));
    
@@ -2428,13 +2428,13 @@ void FLQuant3::Init(int i8, int i7, SEXP x)
    if (InitFlag(i8, i7)) 
       unalloc(i8, i7);
 
-   SEXP Quant    = GET_SLOT(x, install(".Data")),
+   SEXP Quant    = GET_SLOT(x, Rf_install(".Data")),
         dims     = GET_DIM(Quant),
         dimnames = GET_DIMNAMES(Quant);
 
    double *Q     = NUMERIC_POINTER(AS_NUMERIC(Quant));
 
-   int dim[6], n = length(dims);
+   int dim[6], n = Rf_length(dims);
 
    dim[0] = INTEGER(dims)[0];
    dim[1] = INTEGER(dims)[1];
@@ -2573,7 +2573,7 @@ SEXP FLQuant3::Return(int i8, int i7)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = maxquant(i8,i7)-minquant(i8,i7) +1;
     INTEGER(dim)[1] = maxyr(i8,i7)   -minyr(i8,i7)    +1;
     INTEGER(dim)[2] = nunits(i8,i7); 
@@ -2585,26 +2585,26 @@ SEXP FLQuant3::Return(int i8, int i7)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, maxquant(i8,i7)-minquant(i8,i7) +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxquant(i8,i7)-minquant(i8,i7) +1));
     for (iAge=minquant(i8,i7), i=0; iAge<=maxquant(i8,i7); iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, maxyr(i8,i7)-minyr(i8,i7)+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, maxyr(i8,i7)-minyr(i8,i7)+1));
     for (iYear=minyr(i8,i7), i=0; iYear<=maxyr(i8,i7); iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     if (nunits(i8,i7)==1)
        {
-       PROTECT(d3 = allocVector(STRSXP, nunits(i8,i7)));
-       SET_STRING_ELT(d3, 0, mkChar("unique"));
+       PROTECT(d3 = Rf_allocVector(STRSXP, nunits(i8,i7)));
+       SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d3 = allocVector(INTSXP, nunits(i8,i7)));
+       PROTECT(d3 = Rf_allocVector(INTSXP, nunits(i8,i7)));
        for (iUnit=1, i=0; iUnit<=nunits(i8,i7); iUnit++, i++)
           INTEGER(d3)[i] = iUnit; 
        }
@@ -2612,12 +2612,12 @@ SEXP FLQuant3::Return(int i8, int i7)
        
     if (nseasons(i8,i7)==1)
        {
-       PROTECT(d4 = allocVector(STRSXP, nseasons(i8,i7)));
-       SET_STRING_ELT(d4, 0, mkChar("all"));
+       PROTECT(d4 = Rf_allocVector(STRSXP, nseasons(i8,i7)));
+       SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
        }
     else
        {
-       PROTECT(d4 = allocVector(INTSXP, nseasons(i8,i7)));
+       PROTECT(d4 = Rf_allocVector(INTSXP, nseasons(i8,i7)));
        for (iSeason=1, i=0; iSeason<=nseasons(i8,i7); iSeason++, i++)
           INTEGER(d4)[i] = iSeason; 
        }
@@ -2626,33 +2626,33 @@ SEXP FLQuant3::Return(int i8, int i7)
 
     if (nareas(i8,i7)==1)
        {
-       PROTECT(d5 = allocVector(STRSXP, nareas(i8,i7)));
-       SET_STRING_ELT(d5, 0, mkChar("unique"));
+       PROTECT(d5 = Rf_allocVector(STRSXP, nareas(i8,i7)));
+       SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d5 = allocVector(INTSXP, nareas(i8,i7)));
+       PROTECT(d5 = Rf_allocVector(INTSXP, nareas(i8,i7)));
        for (iArea=1, i=0; iArea<=nareas(i8,i7); iArea++, i++)
           INTEGER(d5)[i] = iArea; 
        }
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(INTSXP, niters(i8,i7)));
+    PROTECT(d6 = Rf_allocVector(INTSXP, niters(i8,i7)));
     for (iIter=1, i=0; iIter<=niters(i8,i7); iIter++, i++)
         INTEGER(d6)[i] = iIter; 
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter")); 
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter")); 
  
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
    
     //Set data
     i=0;
@@ -2665,7 +2665,7 @@ SEXP FLQuant3::Return(int i8, int i7)
 			      			    REAL(v)[i++] = data[i8][i7][iAge][iYear][iUnit][iSeason][iArea][iIter]; 
                    
     //Set slot
-    Quant = R_do_slot_assign(Quant, install(".Data"), v);
+    Quant = R_do_slot_assign(Quant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -2676,10 +2676,10 @@ SEXP FLQuant3::Return(void)
    {
    SEXP ReturnObject, ReturnObject2;
 
-   PROTECT(ReturnObject = allocVector(VECSXP,flq_n8));
+   PROTECT(ReturnObject = Rf_allocVector(VECSXP,flq_n8));
    for (int i=1; i<=flq_n8; i++)
        {
-       PROTECT(ReturnObject2 = allocVector(VECSXP,flq_n7[i]));
+       PROTECT(ReturnObject2 = Rf_allocVector(VECSXP,flq_n7[i]));
 
        for (int j=1; j<=flq_n7[i]; j++)
          SET_VECTOR_ELT(ReturnObject2, j-1, Return(i, j));
@@ -3047,13 +3047,13 @@ void FLQuant4::Init(int i9, int i8, int i7, SEXP x)
 
    //PROTECT(duplicate(
 
-   SEXP Quant    = GET_SLOT(x, install(".Data")),
+   SEXP Quant    = GET_SLOT(x, Rf_install(".Data")),
         dims     = GET_DIM(Quant),
         dimnames = GET_DIMNAMES(Quant);
 
    double *Q     = NUMERIC_POINTER(AS_NUMERIC(Quant));
 
-   int dim[6], n = length(dims);
+   int dim[6], n = Rf_length(dims);
 
    dim[0] = INTEGER(dims)[0];
    dim[1] = INTEGER(dims)[1];
@@ -3196,7 +3196,7 @@ SEXP FLQuant4::Return(int i9, int i8, int i7)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1;
     INTEGER(dim)[1] = maxyr(i9,i8,i7)   -minyr(i9,i8,i7)    +1;
     INTEGER(dim)[2] = nunits(i9,i8,i7); 
@@ -3208,26 +3208,26 @@ SEXP FLQuant4::Return(int i9, int i8, int i7)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1));
     for (iAge=minquant(i9,i8,i7), i=0; iAge<=maxquant(i9,i8,i7); iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, maxyr(i9,i8,i7)-minyr(i9,i8,i7)+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, maxyr(i9,i8,i7)-minyr(i9,i8,i7)+1));
     for (iYear=minyr(i9,i8,i7), i=0; iYear<=maxyr(i9,i8,i7); iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     if (nunits(i9,i8,i7)==1)
        {
-       PROTECT(d3 = allocVector(STRSXP, nunits(i9,i8,i7)));
-       SET_STRING_ELT(d3, 0, mkChar("unique"));
+       PROTECT(d3 = Rf_allocVector(STRSXP, nunits(i9,i8,i7)));
+       SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d3 = allocVector(INTSXP, nunits(i9,i8,i7)));
+       PROTECT(d3 = Rf_allocVector(INTSXP, nunits(i9,i8,i7)));
        for (iUnit=1, i=0; iUnit<=nunits(i9,i8,i7); iUnit++, i++)
           INTEGER(d3)[i] = iUnit; 
        }
@@ -3235,12 +3235,12 @@ SEXP FLQuant4::Return(int i9, int i8, int i7)
        
     if (nseasons(i9,i8,i7)==1)
        {
-       PROTECT(d4 = allocVector(STRSXP, nseasons(i9,i8,i7)));
-       SET_STRING_ELT(d4, 0, mkChar("all"));
+       PROTECT(d4 = Rf_allocVector(STRSXP, nseasons(i9,i8,i7)));
+       SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
        }
     else
        {
-       PROTECT(d4 = allocVector(INTSXP, nseasons(i9,i8,i7)));
+       PROTECT(d4 = Rf_allocVector(INTSXP, nseasons(i9,i8,i7)));
        for (iSeason=1, i=0; iSeason<=nseasons(i9,i8,i7); iSeason++, i++)
           INTEGER(d4)[i] = iSeason; 
        }
@@ -3249,33 +3249,33 @@ SEXP FLQuant4::Return(int i9, int i8, int i7)
 
     if (nareas(i9,i8,i7)==1)
        {
-       PROTECT(d5 = allocVector(STRSXP, nareas(i9,i8,i7)));
-       SET_STRING_ELT(d5, 0, mkChar("unique"));
+       PROTECT(d5 = Rf_allocVector(STRSXP, nareas(i9,i8,i7)));
+       SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d5 = allocVector(INTSXP, nareas(i9,i8,i7)));
+       PROTECT(d5 = Rf_allocVector(INTSXP, nareas(i9,i8,i7)));
        for (iArea=1, i=0; iArea<=nareas(i9,i8,i7); iArea++, i++)
           INTEGER(d5)[i] = iArea; 
        }
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(INTSXP, niters(i9,i8,i7)));
+    PROTECT(d6 = Rf_allocVector(INTSXP, niters(i9,i8,i7)));
     for (iIter=1, i=0; iIter<=niters(i9,i8,i7); iIter++, i++)
         INTEGER(d6)[i] = iIter; 
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter")); 
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter")); 
  
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
    
     //Set data
     i=0;
@@ -3288,7 +3288,7 @@ SEXP FLQuant4::Return(int i9, int i8, int i7)
 			      			    REAL(v)[i++] = data[i9][i8][i7][iAge][iYear][iUnit][iSeason][iArea][iIter]; 
                    
     //Set slot
-    Quant = R_do_slot_assign(Quant, install(".Data"), v);
+    Quant = R_do_slot_assign(Quant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -3299,14 +3299,14 @@ SEXP FLQuant4::Return(void)
    {
    SEXP ReturnObject, ReturnObject2, ReturnObject3;
 
-   PROTECT(ReturnObject = allocVector(VECSXP,flq_n9));
+   PROTECT(ReturnObject = Rf_allocVector(VECSXP,flq_n9));
    for (int i=1; i<=flq_n9; i++)
        {
-       PROTECT(ReturnObject2 = allocVector(VECSXP,flq_n8[i]));
+       PROTECT(ReturnObject2 = Rf_allocVector(VECSXP,flq_n8[i]));
 
        for (int j=1; j<=flq_n8[i]; j++)
          {
-	     PROTECT(ReturnObject3 = allocVector(VECSXP,flq_n7[i][j]));
+	     PROTECT(ReturnObject3 = Rf_allocVector(VECSXP,flq_n7[i][j]));
 
          for (int k=1; k<=flq_n7[i][j]; k++)
          	 SET_VECTOR_ELT(ReturnObject3, k-1, Return(i, j, k));
@@ -3680,13 +3680,13 @@ void _FLQuant::Init(int i9, int i8, int i7, SEXP x)
    if (InitFlag(i9, i8, i7)) 
       unalloc(i9, i8, i7);
 
-   SEXP Quant    = GET_SLOT(x, install(".Data")),
+   SEXP Quant    = GET_SLOT(x, Rf_install(".Data")),
         dims     = GET_DIM(Quant),
         dimnames = GET_DIMNAMES(Quant);
 
    double *Q     = NUMERIC_POINTER(AS_NUMERIC(Quant));
 
-   int dim[6], n = length(dims);
+   int dim[6], n = Rf_length(dims);
 
    dim[0] = INTEGER(dims)[0];
    dim[1] = INTEGER(dims)[1];
@@ -3831,7 +3831,7 @@ SEXP _FLQuant::Return(int i7, int i8, int i9)
 
     //Create array for slot    
     //Set dimensions of array
-    PROTECT(dim     = allocVector(INTSXP, 6));       
+    PROTECT(dim     = Rf_allocVector(INTSXP, 6));       
     INTEGER(dim)[0] = maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1;
     INTEGER(dim)[1] = maxyr(i9,i8,i7)   -minyr(i9,i8,i7)    +1;
     INTEGER(dim)[2] = nunits(i9,i8,i7); 
@@ -3843,26 +3843,26 @@ SEXP _FLQuant::Return(int i7, int i8, int i9)
     PROTECT(v = Rf_allocArray(REALSXP, dim)); 
     
     //Create dimension names
-    PROTECT(dimnames = allocVector(VECSXP, 6));
+    PROTECT(dimnames = Rf_allocVector(VECSXP, 6));
     
-    PROTECT(d1 = allocVector(INTSXP, maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1));
+    PROTECT(d1 = Rf_allocVector(INTSXP, maxquant(i9,i8,i7)-minquant(i9,i8,i7) +1));
     for (iAge=minquant(i9,i8,i7), i=0; iAge<=maxquant(i9,i8,i7); iAge++, i++)
         INTEGER(d1)[i] = iAge; 
     SET_VECTOR_ELT(dimnames, 0, d1);
     
-    PROTECT(d2 = allocVector(INTSXP, maxyr(i9,i8,i7)-minyr(i9,i8,i7)+1));
+    PROTECT(d2 = Rf_allocVector(INTSXP, maxyr(i9,i8,i7)-minyr(i9,i8,i7)+1));
     for (iYear=minyr(i9,i8,i7), i=0; iYear<=maxyr(i9,i8,i7); iYear++, i++)
         INTEGER(d2)[i] = iYear; 
     SET_VECTOR_ELT(dimnames, 1, d2);
      
     if (nunits(i9,i8,i7)==1)
        {
-       PROTECT(d3 = allocVector(STRSXP, nunits(i9,i8,i7)));
-       SET_STRING_ELT(d3, 0, mkChar("unique"));
+       PROTECT(d3 = Rf_allocVector(STRSXP, nunits(i9,i8,i7)));
+       SET_STRING_ELT(d3, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d3 = allocVector(INTSXP, nunits(i9,i8,i7)));
+       PROTECT(d3 = Rf_allocVector(INTSXP, nunits(i9,i8,i7)));
        for (iUnit=1, i=0; iUnit<=nunits(i9,i8,i7); iUnit++, i++)
           INTEGER(d3)[i] = iUnit; 
        }
@@ -3870,12 +3870,12 @@ SEXP _FLQuant::Return(int i7, int i8, int i9)
        
     if (nseasons(i9,i8,i7)==1)
        {
-       PROTECT(d4 = allocVector(STRSXP, nseasons(i9,i8,i7)));
-       SET_STRING_ELT(d4, 0, mkChar("all"));
+       PROTECT(d4 = Rf_allocVector(STRSXP, nseasons(i9,i8,i7)));
+       SET_STRING_ELT(d4, 0, Rf_mkChar("all"));
        }
     else
        {
-       PROTECT(d4 = allocVector(INTSXP, nseasons(i9,i8,i7)));
+       PROTECT(d4 = Rf_allocVector(INTSXP, nseasons(i9,i8,i7)));
        for (iSeason=1, i=0; iSeason<=nseasons(i9,i8,i7); iSeason++, i++)
           INTEGER(d4)[i] = iSeason; 
        }
@@ -3884,33 +3884,33 @@ SEXP _FLQuant::Return(int i7, int i8, int i9)
 
     if (nareas(i9,i8,i7)==1)
        {
-       PROTECT(d5 = allocVector(STRSXP, nareas(i9,i8,i7)));
-       SET_STRING_ELT(d5, 0, mkChar("unique"));
+       PROTECT(d5 = Rf_allocVector(STRSXP, nareas(i9,i8,i7)));
+       SET_STRING_ELT(d5, 0, Rf_mkChar("unique"));
        }
     else
        {
-       PROTECT(d5 = allocVector(INTSXP, nareas(i9,i8,i7)));
+       PROTECT(d5 = Rf_allocVector(INTSXP, nareas(i9,i8,i7)));
        for (iArea=1, i=0; iArea<=nareas(i9,i8,i7); iArea++, i++)
           INTEGER(d5)[i] = iArea; 
        }
     SET_VECTOR_ELT(dimnames, 4, d5);
 
-    PROTECT(d6 = allocVector(INTSXP, niters(i9,i8,i7)));
+    PROTECT(d6 = Rf_allocVector(INTSXP, niters(i9,i8,i7)));
     for (iIter=1, i=0; iIter<=niters(i9,i8,i7); iIter++, i++)
         INTEGER(d6)[i] = iIter; 
     SET_VECTOR_ELT(dimnames, 5, d6);
     
     //Create names for dimensions
-    PROTECT(names = allocVector(STRSXP, 6));
-    SET_STRING_ELT(names, 0, mkChar("age"));
-    SET_STRING_ELT(names, 1, mkChar("year"));
-    SET_STRING_ELT(names, 2, mkChar("unit"));
-    SET_STRING_ELT(names, 3, mkChar("season"));
-    SET_STRING_ELT(names, 4, mkChar("area"));
-    SET_STRING_ELT(names, 5, mkChar("iter")); 
+    PROTECT(names = Rf_allocVector(STRSXP, 6));
+    SET_STRING_ELT(names, 0, Rf_mkChar("age"));
+    SET_STRING_ELT(names, 1, Rf_mkChar("year"));
+    SET_STRING_ELT(names, 2, Rf_mkChar("unit"));
+    SET_STRING_ELT(names, 3, Rf_mkChar("season"));
+    SET_STRING_ELT(names, 4, Rf_mkChar("area"));
+    SET_STRING_ELT(names, 5, Rf_mkChar("iter")); 
  
-    setAttrib(dimnames, R_NamesSymbol, names);
-    setAttrib(v, R_DimNamesSymbol, dimnames);
+    Rf_setAttrib(dimnames, R_NamesSymbol, names);
+    Rf_setAttrib(v, R_DimNamesSymbol, dimnames);
    
     //Set data
     i=0;
@@ -3923,7 +3923,7 @@ SEXP _FLQuant::Return(int i7, int i8, int i9)
 			      			    REAL(v)[i++] = data[i9][i8][i7][iAge][iYear][iUnit][iSeason][iArea][iIter]; 
                    
     //Set slot
-    Quant = R_do_slot_assign(Quant, install(".Data"), v);
+    Quant = R_do_slot_assign(Quant, Rf_install(".Data"), v);
 
     UNPROTECT(11);
     
@@ -3934,14 +3934,14 @@ SEXP _FLQuant::Return(void)
    {
    SEXP ReturnObject, ReturnObject2, ReturnObject3;
 
-   PROTECT(ReturnObject = allocVector(VECSXP,flq_n9));
+   PROTECT(ReturnObject = Rf_allocVector(VECSXP,flq_n9));
    for (int i=1; i<=flq_n9; i++)
        {
-       PROTECT(ReturnObject2 = allocVector(VECSXP,flq_n8[i]));
+       PROTECT(ReturnObject2 = Rf_allocVector(VECSXP,flq_n8[i]));
 
        for (int j=1; j<=flq_n8[i]; j++)
          {
-	     PROTECT(ReturnObject3 = allocVector(VECSXP,flq_n7[i][j]));
+	     PROTECT(ReturnObject3 = Rf_allocVector(VECSXP,flq_n7[i][j]));
 
          for (int k=1; k<=flq_n7[i][j]; k++)
          	 SET_VECTOR_ELT(ReturnObject3, k-1, Return(i, j, k));
@@ -4139,7 +4139,7 @@ bool FLFleets::Init(SEXP x)
   for (int i=1; i<=nfleet; i++)
       {
       SEXP fleet   = PROTECT(VECTOR_ELT(x, i-1));
-      SEXP metiers = PROTECT(GET_SLOT(fleet, install("metiers")));
+      SEXP metiers = PROTECT(GET_SLOT(fleet, Rf_install("metiers")));
       nmetier      = NElemList(metiers);
  
       fl_minquant[nfleet] = new int*[nmetier] - 1;
@@ -4170,9 +4170,9 @@ bool FLFleets::Init(SEXP x)
       discards_sel.alloc_n8(i, nmetier); 
       price.alloc_n8(       i, nmetier);
 
-      fcost.Init(    i,PROTECT(GET_SLOT(fleet,install("fcost"))));
-      capacity.Init( i,PROTECT(GET_SLOT(fleet,install("capacity"))));
-      crewshare.Init(i,PROTECT(GET_SLOT(fleet,install("crewshare"))));
+      fcost.Init(    i,PROTECT(GET_SLOT(fleet,Rf_install("fcost"))));
+      capacity.Init( i,PROTECT(GET_SLOT(fleet,Rf_install("capacity"))));
+      crewshare.Init(i,PROTECT(GET_SLOT(fleet,Rf_install("crewshare"))));
 
       effshare.alloc_n7(i, nfleet);
       vcost.alloc_n7(   i, nfleet);
@@ -4180,7 +4180,7 @@ bool FLFleets::Init(SEXP x)
       for (int j=1; j<=nmetier; j++)
          {
          SEXP metier  = PROTECT(VECTOR_ELT(metiers, j-1));
-         SEXP catches = PROTECT(GET_SLOT(metier, install("catches")));
+         SEXP catches = PROTECT(GET_SLOT(metier, Rf_install("catches")));
          nspp         = NElemList(catches);
               
          fl_minquant[i][j] = new int[nspp] - 1;
@@ -4208,27 +4208,27 @@ bool FLFleets::Init(SEXP x)
          discards_sel.alloc_n7(i, j, nspp); 
          price.alloc_n7(       i, j, nspp);
 
-         effshare.Init(i,j,PROTECT(GET_SLOT(metier,install("effshare"))));
-         vcost.Init(   i,j,PROTECT(GET_SLOT(metier,install("vcost"))));
+         effshare.Init(i,j,PROTECT(GET_SLOT(metier,Rf_install("effshare"))));
+         vcost.Init(   i,j,PROTECT(GET_SLOT(metier,Rf_install("vcost"))));
          
          for (int k=1; k<=nspp; k++)
             {
             SEXP flc  = PROTECT(VECTOR_ELT(catches, k-1));
          
-            catch_.Init(      i,j,k,PROTECT(GET_SLOT(flc,install("catch"))));
-            catch_n.Init(     i,j,k,PROTECT(GET_SLOT(flc,install("catch.n"))));
-            catch_wt.Init(    i,j,k,PROTECT(GET_SLOT(flc,install("catch.wt"))));
-            catch_q.Init(     i,j,k,PROTECT(GET_SLOT(flc,install("catch.q"))));
-            catch_sel.Init(   i,j,k,PROTECT(GET_SLOT(flc,install("catch.sel"))));
-            landings.Init(    i,j,k,PROTECT(GET_SLOT(flc,install("landings"))));
-            landings_n.Init(  i,j,k,PROTECT(GET_SLOT(flc,install("landings.n"))));
-            landings_wt.Init( i,j,k,PROTECT(GET_SLOT(flc,install("landings.wt"))));
-            landings_sel.Init(i,j,k,PROTECT(GET_SLOT(flc,install("landings.sel"))));
-            discards.Init(    i,j,k,PROTECT(GET_SLOT(flc,install("discards"))));
-            discards_n.Init(  i,j,k,PROTECT(GET_SLOT(flc,install("discards.n"))));
-            discards_wt.Init( i,j,k,PROTECT(GET_SLOT(flc,install("discards.wt"))));
-            discards_sel.Init(i,j,k,PROTECT(GET_SLOT(flc,install("discards.sel"))));
-            price.Init(       i,j,k,PROTECT(GET_SLOT(flc,install("price"))));
+            catch_.Init(      i,j,k,PROTECT(GET_SLOT(flc,Rf_install("catch"))));
+            catch_n.Init(     i,j,k,PROTECT(GET_SLOT(flc,Rf_install("catch.n"))));
+            catch_wt.Init(    i,j,k,PROTECT(GET_SLOT(flc,Rf_install("catch.wt"))));
+            catch_q.Init(     i,j,k,PROTECT(GET_SLOT(flc,Rf_install("catch.q"))));
+            catch_sel.Init(   i,j,k,PROTECT(GET_SLOT(flc,Rf_install("catch.sel"))));
+            landings.Init(    i,j,k,PROTECT(GET_SLOT(flc,Rf_install("landings"))));
+            landings_n.Init(  i,j,k,PROTECT(GET_SLOT(flc,Rf_install("landings.n"))));
+            landings_wt.Init( i,j,k,PROTECT(GET_SLOT(flc,Rf_install("landings.wt"))));
+            landings_sel.Init(i,j,k,PROTECT(GET_SLOT(flc,Rf_install("landings.sel"))));
+            discards.Init(    i,j,k,PROTECT(GET_SLOT(flc,Rf_install("discards"))));
+            discards_n.Init(  i,j,k,PROTECT(GET_SLOT(flc,Rf_install("discards.n"))));
+            discards_wt.Init( i,j,k,PROTECT(GET_SLOT(flc,Rf_install("discards.wt"))));
+            discards_sel.Init(i,j,k,PROTECT(GET_SLOT(flc,Rf_install("discards.sel"))));
+            price.Init(       i,j,k,PROTECT(GET_SLOT(flc,Rf_install("price"))));
             }
             UNPROTECT(nspp*2); 
          }
@@ -4248,12 +4248,12 @@ SEXP FLFleets::Return(void)
    int i, j, k;
    for (i=1; i<=nfleet; i++)
       {
-      SEXP flf = allocVector(VECSXP,nmetier);
+      SEXP flf = Rf_allocVector(VECSXP,nmetier);
       SEXP flms = PROTECT(NEW_OBJECT(MAKE_CLASS("FLMetiers")));
       
       for (j=1; j<=nmetier; j++)
          {
-         SEXP flm = allocVector(VECSXP,nspp);
+         SEXP flm = Rf_allocVector(VECSXP,nspp);
          SEXP flcs   = PROTECT(NEW_OBJECT(MAKE_CLASS("FLCatches")));
             
          for (k=1; k<=nspp; k++)
@@ -4267,22 +4267,22 @@ SEXP FLFleets::Return(void)
             REAL(Range)[3] = minyr(   i,j,k);
             REAL(Range)[4] = maxyr(   i,j,k);
        
-            SET_SLOT(flc, install("range"), Range);
+            SET_SLOT(flc, Rf_install("range"), Range);
 
-            SET_SLOT(flc, install("catch"),       catch_.Return(      i,j,k));
-            SET_SLOT(flc, install("catch.n"),     catch_n.Return(     i,j,k));
-            SET_SLOT(flc, install("catch.wt"),    catch_wt.Return(    i,j,k));
-            SET_SLOT(flc, install("catch.q"),     catch_q.Return(     i,j,k));
-            SET_SLOT(flc, install("catch.sel"),   catch_sel.Return(   i,j,k));
-            SET_SLOT(flc, install("landings"),    landings.Return(    i,j,k));
-            SET_SLOT(flc, install("landings.n"),  landings_n.Return(  i,j,k));
-            SET_SLOT(flc, install("landings.wt"), landings_wt.Return( i,j,k));
-            SET_SLOT(flc, install("landings.sel"),landings_sel.Return(i,j,k)); 
-            SET_SLOT(flc, install("discards"),    discards.Return(    i,j,k));
-            SET_SLOT(flc, install("discards.n"),  discards_n.Return(  i,j,k));
-            SET_SLOT(flc, install("discards.wt"), discards_wt.Return( i,j,k));
-            SET_SLOT(flc, install("discards.sel"),discards_sel.Return(i,j,k)); 
-            SET_SLOT(flc, install("price"),       price.Return(       i,j,k));
+            SET_SLOT(flc, Rf_install("catch"),       catch_.Return(      i,j,k));
+            SET_SLOT(flc, Rf_install("catch.n"),     catch_n.Return(     i,j,k));
+            SET_SLOT(flc, Rf_install("catch.wt"),    catch_wt.Return(    i,j,k));
+            SET_SLOT(flc, Rf_install("catch.q"),     catch_q.Return(     i,j,k));
+            SET_SLOT(flc, Rf_install("catch.sel"),   catch_sel.Return(   i,j,k));
+            SET_SLOT(flc, Rf_install("landings"),    landings.Return(    i,j,k));
+            SET_SLOT(flc, Rf_install("landings.n"),  landings_n.Return(  i,j,k));
+            SET_SLOT(flc, Rf_install("landings.wt"), landings_wt.Return( i,j,k));
+            SET_SLOT(flc, Rf_install("landings.sel"),landings_sel.Return(i,j,k)); 
+            SET_SLOT(flc, Rf_install("discards"),    discards.Return(    i,j,k));
+            SET_SLOT(flc, Rf_install("discards.n"),  discards_n.Return(  i,j,k));
+            SET_SLOT(flc, Rf_install("discards.wt"), discards_wt.Return( i,j,k));
+            SET_SLOT(flc, Rf_install("discards.sel"),discards_sel.Return(i,j,k)); 
+            SET_SLOT(flc, Rf_install("price"),       price.Return(       i,j,k));
 
 return(flc);
 
@@ -4290,19 +4290,19 @@ return(flc);
    
             UNPROTECT(2);
             }
-         SET_SLOT(flm, install("effshare"), effshare.Return(i,j));
-         SET_SLOT(flm, install("vcos"),     vcost.Return(    i,j));
+         SET_SLOT(flm, Rf_install("effshare"), effshare.Return(i,j));
+         SET_SLOT(flm, Rf_install("vcos"),     vcost.Return(    i,j));
          
          SET_VECTOR_ELT(flms, j-1, flm);
          }
-      SET_SLOT(flf, install("fcost"),     fcost.Return(     i));
-      SET_SLOT(flf, install("capacity"),  capacity.Return(  i));
-      SET_SLOT(flf, install("crewshare"), crewshare.Return(i));
+      SET_SLOT(flf, Rf_install("fcost"),     fcost.Return(     i));
+      SET_SLOT(flf, Rf_install("capacity"),  capacity.Return(  i));
+      SET_SLOT(flf, Rf_install("crewshare"), crewshare.Return(i));
 
       SET_VECTOR_ELT(flfs, i-1, flf);
       }
 
-   ReturnObject = R_do_slot_assign(fleets, install(".Data"), flfs);
+   ReturnObject = R_do_slot_assign(fleets, Rf_install(".Data"), flfs);
           
    UNPROTECT(1);
 /*
@@ -4474,17 +4474,17 @@ void FLBiols::Init(SEXP x)
       {
       SEXP biol = PROTECT(VECTOR_ELT(x, i-1));
 
-      _minquant[i] = (int)REAL(GET_SLOT(biol, install("range")))[0];
-      _maxquant[i] = (int)REAL(GET_SLOT(biol, install("range")))[1];
-      _plusgrp[i]  = (int)REAL(GET_SLOT(biol, install("range")))[2];
-      _minyr[i]    = (int)REAL(GET_SLOT(biol, install("range")))[3];
-      _maxyr[i]    = (int)REAL(GET_SLOT(biol, install("range")))[4];
+      _minquant[i] = (int)REAL(GET_SLOT(biol, Rf_install("range")))[0];
+      _maxquant[i] = (int)REAL(GET_SLOT(biol, Rf_install("range")))[1];
+      _plusgrp[i]  = (int)REAL(GET_SLOT(biol, Rf_install("range")))[2];
+      _minyr[i]    = (int)REAL(GET_SLOT(biol, Rf_install("range")))[3];
+      _maxyr[i]    = (int)REAL(GET_SLOT(biol, Rf_install("range")))[4];
 
-      n.Init(   i, GET_SLOT(biol, install("n"))); 
-      m.Init(   i, GET_SLOT(biol, install("m"))); 
-      wt.Init(  i, GET_SLOT(biol, install("wt"))); 
-      fec.Init( i, GET_SLOT(biol, install("fec"))); 
-      spwn.Init(i, GET_SLOT(biol, install("spwn"))); 
+      n.Init(   i, GET_SLOT(biol, Rf_install("n"))); 
+      m.Init(   i, GET_SLOT(biol, Rf_install("m"))); 
+      wt.Init(  i, GET_SLOT(biol, Rf_install("wt"))); 
+      fec.Init( i, GET_SLOT(biol, Rf_install("fec"))); 
+      spwn.Init(i, GET_SLOT(biol, Rf_install("spwn"))); 
       }
 
   UNPROTECT(nspp); 
@@ -4511,7 +4511,7 @@ FLBiols::~FLBiols(void)
 SEXP FLBiols::Return(void)
    {
    SEXP ReturnObject = PROTECT(NEW_OBJECT(MAKE_CLASS("FLBiols")));
-   SEXP biols        = PROTECT(allocVector(VECSXP,nspp));
+   SEXP biols        = PROTECT(Rf_allocVector(VECSXP,nspp));
    
    for (int i=1; i<=nspp; i++)
       {
@@ -4524,20 +4524,20 @@ SEXP FLBiols::Return(void)
       REAL(Range)[3] = minyr(i);
       REAL(Range)[4] = maxyr(i);
        
-      SET_SLOT(biol, install("range"), Range);
+      SET_SLOT(biol, Rf_install("range"), Range);
 
-      SET_SLOT(biol, install("n"),     n.Return(i));
-      SET_SLOT(biol, install("m"),     m.Return(i));
-      SET_SLOT(biol, install("wt"),    wt.Return(i));
-      SET_SLOT(biol, install("fec"),   fec.Return(i));
-      SET_SLOT(biol, install("spwn"),  spwn.Return(i));
+      SET_SLOT(biol, Rf_install("n"),     n.Return(i));
+      SET_SLOT(biol, Rf_install("m"),     m.Return(i));
+      SET_SLOT(biol, Rf_install("wt"),    wt.Return(i));
+      SET_SLOT(biol, Rf_install("fec"),   fec.Return(i));
+      SET_SLOT(biol, Rf_install("spwn"),  spwn.Return(i));
 
       SET_VECTOR_ELT(biols, i-1, biol);
       
       UNPROTECT(2);
       }
 
-   ReturnObject = R_do_slot_assign(ReturnObject, install(".Data"), biols);
+   ReturnObject = R_do_slot_assign(ReturnObject, Rf_install(".Data"), biols);
           
    UNPROTECT(2);
 
@@ -4667,33 +4667,33 @@ void FLStocks::Init(SEXP x)
       {
       SEXP xstock = PROTECT(VECTOR_ELT(x, i-1));
 
-      _minquant[i] = (int)REAL(GET_SLOT(xstock, install("range")))[0];
-      _maxquant[i] = (int)REAL(GET_SLOT(xstock, install("range")))[1];
-      _plusgrp[i]  = (int)REAL(GET_SLOT(xstock, install("range")))[2];
-      _minyr[i]    = (int)REAL(GET_SLOT(xstock, install("range")))[3];
-      _maxyr[i]    = (int)REAL(GET_SLOT(xstock, install("range")))[4];
-      _minfbar[i]  = (int)REAL(GET_SLOT(xstock, install("range")))[5];
-      _maxfbar[i]  = (int)REAL(GET_SLOT(xstock, install("range")))[6];
+      _minquant[i] = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[0];
+      _maxquant[i] = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[1];
+      _plusgrp[i]  = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[2];
+      _minyr[i]    = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[3];
+      _maxyr[i]    = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[4];
+      _minfbar[i]  = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[5];
+      _maxfbar[i]  = (int)REAL(GET_SLOT(xstock, Rf_install("range")))[6];
         
       _niters[i]   = 1;
 
-      stock.Init(       i, GET_SLOT(xstock, install("stock"))); 
-      stock_n.Init(     i, GET_SLOT(xstock, install("stock.n"))); 
-      stock_wt.Init(    i, GET_SLOT(xstock, install("stock.wt"))); 
-      catch_.Init(      i, GET_SLOT(xstock, install("catch"))); 
-      catch_n.Init(     i, GET_SLOT(xstock, install("catch.n"))); 
-      catch_wt.Init(    i, GET_SLOT(xstock, install("catch.wt"))); 
-      landings.Init(    i, GET_SLOT(xstock, install("catch"))); 
-      landings_n.Init(  i, GET_SLOT(xstock, install("catch.n"))); 
-      landings_wt.Init( i, GET_SLOT(xstock, install("catch.wt"))); 
-      discards.Init(    i, GET_SLOT(xstock, install("discards"))); 
-      discards_n.Init(  i, GET_SLOT(xstock, install("discards.n"))); 
-      discards_wt.Init( i, GET_SLOT(xstock, install("discards.wt"))); 
-      m.Init(           i, GET_SLOT(xstock, install("m"))); 
-      mat.Init(         i, GET_SLOT(xstock, install("mat"))); 
-      harvest.Init(     i, GET_SLOT(xstock, install("harvest")));
-      harvest_spwn.Init(i, GET_SLOT(xstock, install("harvest.spwn")));
-      m_spwn.Init(      i, GET_SLOT(xstock, install("m.spwn")));
+      stock.Init(       i, GET_SLOT(xstock, Rf_install("stock"))); 
+      stock_n.Init(     i, GET_SLOT(xstock, Rf_install("stock.n"))); 
+      stock_wt.Init(    i, GET_SLOT(xstock, Rf_install("stock.wt"))); 
+      catch_.Init(      i, GET_SLOT(xstock, Rf_install("catch"))); 
+      catch_n.Init(     i, GET_SLOT(xstock, Rf_install("catch.n"))); 
+      catch_wt.Init(    i, GET_SLOT(xstock, Rf_install("catch.wt"))); 
+      landings.Init(    i, GET_SLOT(xstock, Rf_install("catch"))); 
+      landings_n.Init(  i, GET_SLOT(xstock, Rf_install("catch.n"))); 
+      landings_wt.Init( i, GET_SLOT(xstock, Rf_install("catch.wt"))); 
+      discards.Init(    i, GET_SLOT(xstock, Rf_install("discards"))); 
+      discards_n.Init(  i, GET_SLOT(xstock, Rf_install("discards.n"))); 
+      discards_wt.Init( i, GET_SLOT(xstock, Rf_install("discards.wt"))); 
+      m.Init(           i, GET_SLOT(xstock, Rf_install("m"))); 
+      mat.Init(         i, GET_SLOT(xstock, Rf_install("mat"))); 
+      harvest.Init(     i, GET_SLOT(xstock, Rf_install("harvest")));
+      harvest_spwn.Init(i, GET_SLOT(xstock, Rf_install("harvest.spwn")));
+      m_spwn.Init(      i, GET_SLOT(xstock, Rf_install("m.spwn")));
 
       _niters[i] =__max(_niters[i], stock.niters(i)); 
       _niters[i] =__max(_niters[i], stock_n.niters(i));    
@@ -4897,7 +4897,7 @@ FLStocks::~FLStocks(void)
 SEXP FLStocks::Return(void)
    {
    SEXP ReturnObject = PROTECT(NEW_OBJECT(MAKE_CLASS("FLStocks")));
-   SEXP stocks       = PROTECT(allocVector(VECSXP,_nspp));
+   SEXP stocks       = PROTECT(Rf_allocVector(VECSXP,_nspp));
    
    for (int i=1; i<=_nspp; i++)
       {
@@ -4910,30 +4910,30 @@ SEXP FLStocks::Return(void)
       REAL(Range)[3] = minyr(i);
       REAL(Range)[4] = maxyr(i);
        
-      SET_SLOT(_stock, install("range"), Range);
+      SET_SLOT(_stock, Rf_install("range"), Range);
 
-      SET_SLOT(_stock, install("stock"),        stock.Return(       i));
-      SET_SLOT(_stock, install("stock.n"),      stock_n.Return(     i));
-      SET_SLOT(_stock, install("stock.wt"),     stock_wt.Return(    i));
-      SET_SLOT(_stock, install("catch"),        catch_.Return(      i));
-      SET_SLOT(_stock, install("catch.n"),      catch_n.Return(     i));
-      SET_SLOT(_stock, install("catch.wt"),     catch_wt.Return(    i));
-      SET_SLOT(_stock, install("landings"),     landings.Return(    i));
-      SET_SLOT(_stock, install("landings.n"),   landings_n.Return(  i));
-      SET_SLOT(_stock, install("landings.wt"),  landings_wt.Return( i));
-      SET_SLOT(_stock, install("discards"),     discards.Return(    i));
-      SET_SLOT(_stock, install("discards.n"),   discards_n.Return(  i));
-      SET_SLOT(_stock, install("discards.wt"),  discards_wt.Return( i));
-      SET_SLOT(_stock, install("m"),            m.Return(           i));
-      SET_SLOT(_stock, install("mat"),          mat.Return(         i));
-      SET_SLOT(_stock, install("harvest"),      harvest.Return(     i));
-      SET_SLOT(_stock, install("harvest.spwn"), harvest_spwn.Return(i));
-      SET_SLOT(_stock, install("m.spwn"),       m_spwn.Return(      i));
+      SET_SLOT(_stock, Rf_install("stock"),        stock.Return(       i));
+      SET_SLOT(_stock, Rf_install("stock.n"),      stock_n.Return(     i));
+      SET_SLOT(_stock, Rf_install("stock.wt"),     stock_wt.Return(    i));
+      SET_SLOT(_stock, Rf_install("catch"),        catch_.Return(      i));
+      SET_SLOT(_stock, Rf_install("catch.n"),      catch_n.Return(     i));
+      SET_SLOT(_stock, Rf_install("catch.wt"),     catch_wt.Return(    i));
+      SET_SLOT(_stock, Rf_install("landings"),     landings.Return(    i));
+      SET_SLOT(_stock, Rf_install("landings.n"),   landings_n.Return(  i));
+      SET_SLOT(_stock, Rf_install("landings.wt"),  landings_wt.Return( i));
+      SET_SLOT(_stock, Rf_install("discards"),     discards.Return(    i));
+      SET_SLOT(_stock, Rf_install("discards.n"),   discards_n.Return(  i));
+      SET_SLOT(_stock, Rf_install("discards.wt"),  discards_wt.Return( i));
+      SET_SLOT(_stock, Rf_install("m"),            m.Return(           i));
+      SET_SLOT(_stock, Rf_install("mat"),          mat.Return(         i));
+      SET_SLOT(_stock, Rf_install("harvest"),      harvest.Return(     i));
+      SET_SLOT(_stock, Rf_install("harvest.spwn"), harvest_spwn.Return(i));
+      SET_SLOT(_stock, Rf_install("m.spwn"),       m_spwn.Return(      i));
 
       SET_VECTOR_ELT(stocks, i-1, _stock);
       }
 
-   ReturnObject = R_do_slot_assign(ReturnObject, install(".Data"), stocks);
+   ReturnObject = R_do_slot_assign(ReturnObject, Rf_install(".Data"), stocks);
           
    UNPROTECT(4);
 
@@ -5068,19 +5068,19 @@ void FLIndices::Init(SEXP x)
       {
       SEXP xidx = PROTECT(VECTOR_ELT(x, i-1));
 
-      _minquant[i] = (int)REAL(GET_SLOT(xidx, install("range")))[0];
-      _maxquant[i] = (int)REAL(GET_SLOT(xidx, install("range")))[1];
-      _plusgrp[i]  = (int)REAL(GET_SLOT(xidx, install("range")))[2];
-      _minyr[i]    = (int)REAL(GET_SLOT(xidx, install("range")))[3];
-      _maxyr[i]    = (int)REAL(GET_SLOT(xidx, install("range")))[4];
+      _minquant[i] = (int)REAL(GET_SLOT(xidx, Rf_install("range")))[0];
+      _maxquant[i] = (int)REAL(GET_SLOT(xidx, Rf_install("range")))[1];
+      _plusgrp[i]  = (int)REAL(GET_SLOT(xidx, Rf_install("range")))[2];
+      _minyr[i]    = (int)REAL(GET_SLOT(xidx, Rf_install("range")))[3];
+      _maxyr[i]    = (int)REAL(GET_SLOT(xidx, Rf_install("range")))[4];
 
-      catch_n.Init(    i, GET_SLOT(xidx, install("catch.n"))); 
-      catch_wt.Init(   i, GET_SLOT(xidx, install("catch.wt"))); 
-      effort.Init(     i, GET_SLOT(xidx, install("effort"))); 
-      sel_pattern.Init(i, GET_SLOT(xidx, install("sel.pattern"))); 
-      index_q.Init(    i, GET_SLOT(xidx, install("index.q"))); 
-      index.Init(      i, GET_SLOT(xidx, install("index"))); 
-      index_var.Init(  i, GET_SLOT(xidx, install("index.var"))); 
+      catch_n.Init(    i, GET_SLOT(xidx, Rf_install("catch.n"))); 
+      catch_wt.Init(   i, GET_SLOT(xidx, Rf_install("catch.wt"))); 
+      effort.Init(     i, GET_SLOT(xidx, Rf_install("effort"))); 
+      sel_pattern.Init(i, GET_SLOT(xidx, Rf_install("sel.pattern"))); 
+      index_q.Init(    i, GET_SLOT(xidx, Rf_install("index.q"))); 
+      index.Init(      i, GET_SLOT(xidx, Rf_install("index"))); 
+      index_var.Init(  i, GET_SLOT(xidx, Rf_install("index.var"))); 
       }
 
   UNPROTECT(nidx); 
@@ -5107,7 +5107,7 @@ FLIndices::~FLIndices(void)
 SEXP FLIndices::Return(void)
    {
    SEXP ReturnObject = PROTECT(NEW_OBJECT(MAKE_CLASS("FLIndices")));
-   SEXP idxs       = PROTECT(allocVector(VECSXP,nidx));
+   SEXP idxs       = PROTECT(Rf_allocVector(VECSXP,nidx));
    
    for (int i=1; i<=nidx; i++)
       {
@@ -5120,22 +5120,22 @@ SEXP FLIndices::Return(void)
       REAL(Range)[3] = minyr(i);
       REAL(Range)[4] = maxyr(i);
        
-      SET_SLOT(_idx, install("range"), Range);
+      SET_SLOT(_idx, Rf_install("range"), Range);
 
-      SET_SLOT(_idx, install("catch.n"),     catch_n.Return(    i));
-      SET_SLOT(_idx, install("catch.wt"),    catch_wt.Return(   i));
-      SET_SLOT(_idx, install("effort"),      effort.Return(     i));
-      SET_SLOT(_idx, install("sel.pattern"), sel_pattern.Return(i));
-      SET_SLOT(_idx, install("index.q"),     index_q.Return(    i));
-      SET_SLOT(_idx, install("index"),       index.Return(      i));
-      SET_SLOT(_idx, install("index.var"),   index_var.Return(  i));
+      SET_SLOT(_idx, Rf_install("catch.n"),     catch_n.Return(    i));
+      SET_SLOT(_idx, Rf_install("catch.wt"),    catch_wt.Return(   i));
+      SET_SLOT(_idx, Rf_install("effort"),      effort.Return(     i));
+      SET_SLOT(_idx, Rf_install("sel.pattern"), sel_pattern.Return(i));
+      SET_SLOT(_idx, Rf_install("index.q"),     index_q.Return(    i));
+      SET_SLOT(_idx, Rf_install("index"),       index.Return(      i));
+      SET_SLOT(_idx, Rf_install("index.var"),   index_var.Return(  i));
 
       SET_VECTOR_ELT(idxs, i-1, _idx);
       
       UNPROTECT(2);
       }
 
-   ReturnObject = R_do_slot_assign(ReturnObject, install(".Data"), idxs);
+   ReturnObject = R_do_slot_assign(ReturnObject, Rf_install(".Data"), idxs);
           
    UNPROTECT(2);
 

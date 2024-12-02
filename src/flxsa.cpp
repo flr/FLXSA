@@ -10,7 +10,7 @@ extern "C" SEXP runFLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags)
    char *err4 = const_cast<char*>("Error in running XSA");
 
    //Input Catch Data
-   CatchDataR Catch(PROTECT(duplicate(GET_SLOT(Stock, install("catch.n"))))); 
+   CatchDataR Catch(PROTECT(Rf_duplicate(GET_SLOT(Stock, Rf_install("catch.n"))))); 
    UNPROTECT(1);      
    if (Catch.Error != FiFiErrNull)
       return ReturnError(err1);
@@ -21,12 +21,12 @@ extern "C" SEXP runFLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags)
       return ReturnError(err2);
       
    //Input XSAControls
-   ExtendedSurvivorsAnalysisR XSA(Control, PROTECT(duplicate(GET_SLOT(Stock, install("m")))), &Catch, &TuningData); 
+   ExtendedSurvivorsAnalysisR XSA(Control, PROTECT(Rf_duplicate(GET_SLOT(Stock, Rf_install("m")))), &Catch, &TuningData); 
    UNPROTECT(1);      
    if (XSA.Error != FiFiErrNull)
       return ReturnError(err3);
 
-   InputRange(PROTECT(duplicate(GET_SLOT(Stock, install("range")))), &MinAge, &MaxAge, &Plusgroup, &MinYear, &MaxYear);
+   InputRange(PROTECT(Rf_duplicate(GET_SLOT(Stock, Rf_install("range")))), &MinAge, &MaxAge, &Plusgroup, &MinYear, &MaxYear);
    UNPROTECT(1);      
     
    //Run XSA
@@ -40,7 +40,7 @@ extern "C" SEXP runFLXSA(SEXP Stock, SEXP CPUE, SEXP Control, SEXP diags)
        return ReturnError(err4);
 
    //Results  
-   if (isLogical(diags) && !LOGICAL(diags)[0])
+   if (Rf_isLogical(diags) && !LOGICAL(diags)[0])
       return XSA.ReturnSimple(MaxYear); 
    else
          return XSA.Return(MaxYear); 
